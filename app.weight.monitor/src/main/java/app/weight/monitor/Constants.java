@@ -1,4 +1,4 @@
-package app.weight.monitor.model;
+package app.weight.monitor;
 
 import app.weight.monitor.storage.ModelConstants;
 import application.definition.BaseConstants;
