@@ -1,4 +1,4 @@
-package app.weight.monitor.storage;
+package app.weight.monitor;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -9,9 +9,13 @@ import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.io.TempDir;
 
 import app.weight.monitor.model.Reading;
+import app.weight.monitor.storage.ReadingsLoad;
+import app.weight.monitor.storage.ReadingsManager;
+import app.weight.monitor.storage.ReadingsStore;
 import application.notification.Notification;
 import application.notification.NotificationListener;
 import application.storage.LoadState;
+import application.storage.Storage;
 import application.storage.StorageNotificationType;
 import application.storage.StoreState;
 
@@ -22,13 +26,18 @@ public class BaseTest {
 	protected File rootDirectory;
 
 	protected Object waitForFinish = new Object();
-	boolean storeSuccess = false;
-	boolean loadSuccess = false;
+	protected boolean storeSuccess = false;
+	protected boolean loadSuccess = false;
 	boolean failedIO = false;
 
-	DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+	protected DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
 
 	Reading reading = new Reading(LocalDate.now(), "72.0");
+
+	protected ReadingsLoad readingsLoad = null;
+	protected ReadingsStore readingsStore = null;
+
+	protected File modelFile = null;
 
 	protected NotificationListener listener = new NotificationListener() {
 		@Override
@@ -92,7 +101,29 @@ public class BaseTest {
 		failedIO = false;
 	}
 
+	protected Storage initStorage() {
+		modelFile = new File(rootDirectory, "model.dat");
+		readingsStore.setFileName(modelFile.getAbsolutePath());
+		Storage storage = new Storage();
+		return storage;
+	}
+
+	protected void writeToStore(Storage storage) throws InterruptedException {
+		synchronized (waitForFinish) {
+			storage.storeData(readingsStore);
+			waitForFinish.wait();
+		}
+	}
+
 	protected void addAReading() throws Exception {
+		synchronized (waitForFinish) {
+			ReadingsManager.instance().addReading(reading);
+			waitForFinish.wait();
+		}
+	}
+
+	protected void addAReading(LocalDate date, String weight) throws Exception {
+		reading = new Reading(date, weight);
 		synchronized (waitForFinish) {
 			ReadingsManager.instance().addReading(reading);
 			waitForFinish.wait();

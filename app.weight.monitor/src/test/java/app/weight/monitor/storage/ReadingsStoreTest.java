@@ -1,18 +1,25 @@
 package app.weight.monitor.storage;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.util.List;
 import java.util.logging.Level;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import app.weight.monitor.BaseTest;
 import application.definition.ApplicationConfiguration;
 import application.definition.ApplicationDefinition;
 import application.logging.LogConfigurer;
 import application.notification.NotificationCentre;
 import application.notification.NotificationMonitor;
+import application.storage.Storage;
 
 class ReadingsStoreTest extends BaseTest {
 
@@ -30,6 +37,8 @@ class ReadingsStoreTest extends BaseTest {
 		NotificationCentre.addListener(listener);
 		if (runMonitor)
 			new NotificationMonitor(System.out);
+		readingsStore = new ReadingsStore();
+		modelFile = new File(rootDirectory, "model.dat");
 	}
 
 	@AfterEach
@@ -44,8 +53,22 @@ class ReadingsStoreTest extends BaseTest {
 	}
 
 	@Test
-	void testNotNull() {
-		assertNotNull(ReadingsManager.instance());
+	void testStore() throws Exception {
+		assertFalse(storeSuccess);
+		assertFalse(modelFile.exists());
+		Storage storage = initStorage();
+		createEntries();
+		writeToStore(storage);
+		assertTrue(modelFile.exists());
+		assertTrue(storeSuccess);
+		List<String> lines = Files.readAllLines(modelFile.toPath());
+		assertEquals(3, lines.size());
+	}
+
+	private void createEntries() throws Exception {
+		addAReading();
+		addAReading();
+		addAReading();
 	}
 
 }

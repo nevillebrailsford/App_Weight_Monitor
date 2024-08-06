@@ -1,6 +1,7 @@
 package app.weight.monitor.storage;
 
 import java.io.File;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -95,6 +96,21 @@ public class ReadingsManager {
 		List<Reading> copyList = readings.stream().sorted().collect(Collectors.toList());
 		LOGGER.exiting(CLASS_NAME, "readings", copyList);
 		return copyList;
+	}
+
+	public Reading[] readingsFor(LocalDate date) {
+		LOGGER.entering(CLASS_NAME, "readingsFor");
+		List<Reading> list = readings.stream().filter((r) -> r.date().equals(date)).collect(Collectors.toList());
+		Reading[] result = list.toArray(new Reading[] {});
+		LOGGER.exiting(CLASS_NAME, "readingsFor", result);
+		return result;
+	}
+
+	public long countEntries(LocalDate date) {
+		LOGGER.entering(CLASS_NAME, "countEntries");
+		long count = readings.stream().filter((r) -> r.date().equals(date)).count();
+		LOGGER.exiting(CLASS_NAME, "countEntries", count);
+		return count;
 	}
 
 	private void updateStorage() {

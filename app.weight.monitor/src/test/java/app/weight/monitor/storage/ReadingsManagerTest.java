@@ -1,16 +1,16 @@
-package app.weight.monitor.model;
+package app.weight.monitor.storage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.time.LocalDate;
 import java.util.logging.Level;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import app.weight.monitor.storage.BaseTest;
-import app.weight.monitor.storage.ReadingsManager;
+import app.weight.monitor.BaseTest;
 import application.definition.ApplicationConfiguration;
 import application.definition.ApplicationDefinition;
 import application.logging.LogConfigurer;
@@ -62,5 +62,26 @@ class ReadingsManagerTest extends BaseTest {
 		assertEquals(1, ReadingsManager.instance().readings().size());
 		clearReadings();
 		assertEquals(0, ReadingsManager.instance().readings().size());
+	}
+
+	@Test
+	void testCount() throws Exception {
+		assertEquals(0, ReadingsManager.instance().countEntries(LocalDate.now()));
+		addAReading();
+		assertEquals(1, ReadingsManager.instance().countEntries(LocalDate.now()));
+		addAReading();
+		assertEquals(2, ReadingsManager.instance().countEntries(LocalDate.now()));
+	}
+
+	@Test
+	void testEntriesFor() throws Exception {
+		assertEquals(0, ReadingsManager.instance().readingsFor(LocalDate.now()).length);
+		addAReading();
+		assertEquals(1, ReadingsManager.instance().readingsFor(LocalDate.now()).length);
+		addAReading();
+		assertEquals(2, ReadingsManager.instance().readingsFor(LocalDate.now()).length);
+		addAReading(LocalDate.now().plusDays(1), "77");
+		assertEquals(3, ReadingsManager.instance().readings().size());
+		assertEquals(2, ReadingsManager.instance().readingsFor(LocalDate.now()).length);
 	}
 }
