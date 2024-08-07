@@ -5,6 +5,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
@@ -36,6 +38,7 @@ public class ReadingsLoad extends AbstractLoadData {
 
 	private void readDataFrom(BufferedReader archive) throws IOException {
 		LOGGER.entering(CLASS_NAME, "readDataFrom");
+		List<Reading> readings = new ArrayList<>();
 		do {
 			String reading = archive.readLine();
 			StringTokenizer st = new StringTokenizer(reading, " ");
@@ -43,9 +46,10 @@ public class ReadingsLoad extends AbstractLoadData {
 				LocalDate date = LocalDate.parse(st.nextToken(), dateFormatter);
 				String weight = st.nextToken();
 				Reading newReading = new Reading(date, weight);
-				ReadingsManager.instance().addReading(newReading);
+				readings.add(newReading);
 			}
 		} while (archive.ready());
+		ReadingsManager.instance().addReadings(readings);
 		LOGGER.exiting(CLASS_NAME, "readDataFrom");
 	}
 }

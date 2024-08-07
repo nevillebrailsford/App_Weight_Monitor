@@ -3,6 +3,7 @@ package app.weight.monitor.storage;
 import java.io.File;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -81,9 +82,20 @@ public class ReadingsManager {
 		}
 		synchronized (readings) {
 			readings.add(reading);
+			Collections.sort(this.readings);
 			updateStorage();
 		}
 		LOGGER.exiting(CLASS_NAME, "addReading");
+	}
+
+	public void addReadings(List<Reading> readings) {
+		LOGGER.entering(CLASS_NAME, "");
+		synchronized (this.readings) {
+			this.readings.addAll(readings);
+			Collections.sort(this.readings);
+			updateStorage();
+		}
+		LOGGER.exiting(CLASS_NAME, "");
 	}
 
 	/**

@@ -1,16 +1,37 @@
 package app.weight.monitor.application;
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
 import java.util.Optional;
 import java.util.logging.Logger;
 
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.event.ListSelectionEvent;
+
+import com.toedter.calendar.JCalendar;
 
 import app.weight.monitor.Constants;
 import app.weight.monitor.storage.ReadingsLoad;
 import application.base.app.ApplicationBaseForGUI;
 import application.base.app.Parameters;
 import application.base.app.gui.ColorProvider;
+import application.base.app.gui.ColoredPanel;
 import application.base.app.gui.GUIConstants;
 import application.definition.ApplicationConfiguration;
 import application.definition.ApplicationDefinition;
@@ -24,6 +45,25 @@ public class WeightMonitor extends ApplicationBaseForGUI {
 	private static Logger LOGGER = null;
 
 	private JFrame parent;
+
+	GridBagConstraints gbc;
+
+	JTabbedPane weightTabbedPane = new JTabbedPane();
+	JPanel editorPanel = new ColoredPanel();
+	WeightPlotPanel plotPanel = new WeightPlotPanel();
+
+	JLabel fileLabel = new JLabel();
+	JTextArea fileTextArea = new JTextArea();
+	JCalendar weightCalendar = new JCalendar();
+	JLabel weightLabel = new JLabel();
+	JTextField weightTextField = new JTextField();
+	JButton addButton = new JButton();
+
+	JLabel weightsListLabel = new JLabel();
+	JScrollPane weightsScrollPane = new JScrollPane();
+	JList<String> weightsList = new JList<>();
+	static DefaultListModel<String> weightsListModel = new DefaultListModel<>();
+	JButton deleteButton = new JButton();
 
 	@Override
 	public void configureStoreDetails() {
@@ -72,6 +112,11 @@ public class WeightMonitor extends ApplicationBaseForGUI {
 		this.parent = parent;
 		System.out.println(
 				"Application " + ApplicationConfiguration.applicationDefinition().applicationName() + " is starting");
+		this.parent.setLayout(new GridBagLayout());
+		configureComponents();
+		layoutComponents();
+		loadData();
+		pack();
 		LOGGER.exiting(CLASS_NAME, "start");
 
 	}
@@ -92,5 +137,150 @@ public class WeightMonitor extends ApplicationBaseForGUI {
 	public static void main(String[] args) {
 		System.setProperty("apple.eawt.quitStrategy", "CLOSE_ALL_WINDOWS");
 		launch(args);
+	}
+
+	private void configureComponents() {
+		weightTabbedPane.setPreferredSize(new Dimension(500, 400));
+		weightTabbedPane.addTab("Weight Editor", editorPanel);
+		weightTabbedPane.addTab("Weight Plot", plotPanel);
+
+		editorPanel.setBackground(new Color(192, 192, 255));
+		editorPanel.setLayout(new GridBagLayout());
+
+		plotPanel.setBackground(new Color(255, 192, 192));
+
+		fileLabel.setText("Current Weight File");
+		fileLabel.setFont(new Font("Arial", Font.BOLD, 14));
+		fileTextArea.setPreferredSize(new Dimension(220, 50));
+		fileTextArea.setFont(new Font("Arial", Font.PLAIN, 12));
+		fileTextArea.setEditable(false);
+		fileTextArea.setBackground(Color.WHITE);
+		fileTextArea.setLineWrap(true);
+		fileTextArea.setWrapStyleWord(true);
+
+		weightCalendar.setPreferredSize(new Dimension(220, 200));
+		weightCalendar.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+		weightCalendar.addPropertyChangeListener((event) -> {
+			weightCalendarPropertyChange(event);
+		});
+
+		weightLabel.setText("Weight(kg)");
+		weightLabel.setFont(new Font("Arial", Font.BOLD, 14));
+		weightTextField.setPreferredSize(new Dimension(100, 25));
+		weightTextField.setFont(new Font("Arial", Font.PLAIN, 12));
+		weightTextField.addActionListener((event) -> weightTextFieldActionPerformed(event));
+
+		addButton.setText("Add Weight to File");
+		addButton.addActionListener((event) -> addButtonActionPerformed(event));
+
+		weightsListLabel.setText("Date         Weight(kg)");
+		weightsListLabel.setFont(new Font("Courier New", Font.BOLD, 16));
+
+		weightsScrollPane.setPreferredSize(new Dimension(250, 300));
+		weightsList.setFont(new Font("Courier New", Font.PLAIN, 16));
+		weightsScrollPane.setViewportView(weightsList);
+		weightsList.addListSelectionListener((event) -> {
+			weightsListValueChanged(event);
+		});
+
+		deleteButton.setText("Delete Selection");
+		deleteButton.addActionListener((event) -> deleteButtonActionPerformed(event));
+	}
+
+	private void deleteButtonActionPerformed(ActionEvent event) {
+		// TODO Auto-generated method stub
+	}
+
+	protected void weightsListValueChanged(ListSelectionEvent event) {
+		// TODO Auto-generated method stub
+	}
+
+	private void addButtonActionPerformed(ActionEvent event) {
+		// TODO Auto-generated method stub
+	}
+
+	private void weightTextFieldActionPerformed(ActionEvent event) {
+		addButton.doClick();
+	}
+
+	protected void weightCalendarPropertyChange(PropertyChangeEvent event) {
+		// TODO Auto-generated method stub
+	}
+
+	private void layoutComponents() {
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		parent.add(weightTabbedPane, gbc);
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridwidth = 2;
+		gbc.insets = new Insets(10, 10, 0, 0);
+		gbc.anchor = GridBagConstraints.WEST;
+		editorPanel.add(fileLabel, gbc);
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.gridwidth = 2;
+		gbc.insets = new Insets(0, 10, 10, 0);
+		editorPanel.add(fileTextArea, gbc);
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		gbc.gridwidth = 2;
+		gbc.insets = new Insets(5, 10, 0, 5);
+		editorPanel.add(weightCalendar, gbc);
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 3;
+		gbc.insets = new Insets(10, 10, 0, 0);
+		editorPanel.add(weightLabel, gbc);
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 3;
+		gbc.insets = new Insets(10, 5, 0, 0);
+		editorPanel.add(weightTextField, gbc);
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 4;
+		gbc.gridwidth = 2;
+		gbc.insets = new Insets(10, 0, 0, 0);
+		editorPanel.add(addButton, gbc);
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 0;
+		gbc.insets = new Insets(10, 10, 0, 0);
+		editorPanel.add(weightsListLabel, gbc);
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 1;
+		gbc.gridheight = 3;
+		gbc.insets = new Insets(0, 5, 0, 0);
+		gbc.anchor = GridBagConstraints.WEST;
+		editorPanel.add(weightsScrollPane, gbc);
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 4;
+		gbc.insets = new Insets(10, 0, 0, 0);
+		gbc.anchor = GridBagConstraints.CENTER;
+		editorPanel.add(deleteButton, gbc);
+	}
+
+	private void loadData() {
+
+	}
+
+	class WeightPlotPanel extends JPanel {
+
 	}
 }
