@@ -1,6 +1,7 @@
 package app.weight.monitor.model;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 /**
@@ -10,6 +11,7 @@ public class Reading implements Comparable<Reading> {
 
 	private LocalDate date = null;
 	private String weight = "";
+	private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
 
 	/**
 	 * Create a new reading.
@@ -71,7 +73,7 @@ public class Reading implements Comparable<Reading> {
 
 	@Override
 	public String toString() {
-		return "Reading [date=" + date + ", weight=" + weight + "]";
+		return date.format(dateFormatter) + "       " + weight;
 	}
 
 	@Override

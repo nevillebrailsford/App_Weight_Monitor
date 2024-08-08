@@ -49,7 +49,7 @@ public class ReadingsLoad extends AbstractLoadData {
 				readings.add(newReading);
 			}
 		} while (archive.ready());
-		ReadingsManager.instance().addReadings(readings);
+		ReadingsManager.instance().initialise(readings);
 		LOGGER.exiting(CLASS_NAME, "readDataFrom");
 	}
 }

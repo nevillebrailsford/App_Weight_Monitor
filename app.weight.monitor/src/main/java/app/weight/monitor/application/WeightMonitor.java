@@ -8,6 +8,10 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -22,12 +26,16 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 
 import com.toedter.calendar.JCalendar;
 
 import app.weight.monitor.Constants;
+import app.weight.monitor.model.Reading;
 import app.weight.monitor.storage.ReadingsLoad;
+import app.weight.monitor.storage.ReadingsManager;
 import application.base.app.ApplicationBaseForGUI;
 import application.base.app.Parameters;
 import application.base.app.gui.ColorProvider;
@@ -38,6 +46,9 @@ import application.definition.ApplicationDefinition;
 import application.inifile.IniFile;
 import application.storage.StoreDetails;
 
+/**
+ * The application to record and monitor my weight readings.
+ */
 public class WeightMonitor extends ApplicationBaseForGUI {
 	private static final long serialVersionUID = 1L;
 	private static final String CLASS_NAME = WeightMonitor.class.getName();
@@ -130,9 +141,14 @@ public class WeightMonitor extends ApplicationBaseForGUI {
 	}
 
 	/**
-	 * Main entry point for program.
+	 * Main entry point for the application.
+	 * <p>
+	 * The parameters that the application will read are:
+	 * <li>--name=x where x is the name to be used by the application.</li>
+	 * <li>--dir=x where x is the path to the working directory.</li>
 	 * 
-	 * @param args - any number of arguments passed in from command line.
+	 * @param args - any number of arguments passed in from command line. The values
+	 *             must include the values for --name and --dir.
 	 */
 	public static void main(String[] args) {
 		System.setProperty("apple.eawt.quitStrategy", "CLOSE_ALL_WINDOWS");
@@ -169,9 +185,27 @@ public class WeightMonitor extends ApplicationBaseForGUI {
 		weightTextField.setPreferredSize(new Dimension(100, 25));
 		weightTextField.setFont(new Font("Arial", Font.PLAIN, 12));
 		weightTextField.addActionListener((event) -> weightTextFieldActionPerformed(event));
+		weightTextField.getDocument().addDocumentListener(new DocumentListener() {
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				addButton.setEnabled(validateWeight());
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				addButton.setEnabled(validateWeight());
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				addButton.setEnabled(validateWeight());
+			}
+		});
 
 		addButton.setText("Add Weight to File");
 		addButton.addActionListener((event) -> addButtonActionPerformed(event));
+		addButton.setEnabled(false);
 
 		weightsListLabel.setText("Date         Weight(kg)");
 		weightsListLabel.setFont(new Font("Courier New", Font.BOLD, 16));
@@ -185,18 +219,25 @@ public class WeightMonitor extends ApplicationBaseForGUI {
 
 		deleteButton.setText("Delete Selection");
 		deleteButton.addActionListener((event) -> deleteButtonActionPerformed(event));
+		deleteButton.setEnabled(false);
 	}
 
 	private void deleteButtonActionPerformed(ActionEvent event) {
-		// TODO Auto-generated method stub
+		System.out.println("deleteButton");
 	}
 
 	protected void weightsListValueChanged(ListSelectionEvent event) {
-		// TODO Auto-generated method stub
+		if (!event.getValueIsAdjusting()) {
+			if (weightsList.getSelectedIndex() == -1) {
+				deleteButton.setEnabled(false);
+			} else {
+				deleteButton.setEnabled(true);
+			}
+		}
 	}
 
 	private void addButtonActionPerformed(ActionEvent event) {
-		// TODO Auto-generated method stub
+		System.out.println("addButton");
 	}
 
 	private void weightTextFieldActionPerformed(ActionEvent event) {
@@ -204,7 +245,12 @@ public class WeightMonitor extends ApplicationBaseForGUI {
 	}
 
 	protected void weightCalendarPropertyChange(PropertyChangeEvent event) {
-		// TODO Auto-generated method stub
+		if (event.getNewValue() != null) {
+			if (event.getNewValue() instanceof Calendar) {
+				Calendar cal = (Calendar) event.getNewValue();
+				LocalDate.ofInstant(cal.toInstant(), ZoneId.systemDefault());
+			}
+		}
 	}
 
 	private void layoutComponents() {
@@ -277,7 +323,31 @@ public class WeightMonitor extends ApplicationBaseForGUI {
 	}
 
 	private void loadData() {
+		initializeData();
+		fileTextArea.setText(ReadingsManager.instance().dataFile().getAbsolutePath());
+		for (Reading reading : ReadingsManager.instance().readings()) {
+			weightsListModel.addElement(reading.toString());
+		}
+		weightsList.ensureIndexIsVisible(ReadingsManager.instance().readings().size() - 1);
+	}
 
+	private void initializeData() {
+		weightTabbedPane.setSelectedIndex(0);
+		weightCalendar.setDate(new Date());
+		weightsListModel.clear();
+		weightsList.setModel(weightsListModel);
+		fileTextArea.setText("New File");
+		weightTextField.setText("");
+		weightTextField.requestFocus();
+	}
+
+	private boolean validateWeight() {
+		String match = "^\\d*\\.?\\d+|\\d+\\.\\d*$";
+		String sel = weightTextField.getText();
+		if (sel == null || sel.isEmpty()) {
+			return false;
+		}
+		return sel.matches(match);
 	}
 
 	class WeightPlotPanel extends JPanel {

@@ -88,12 +88,16 @@ public class ReadingsManager {
 		LOGGER.exiting(CLASS_NAME, "addReading");
 	}
 
-	public void addReadings(List<Reading> readings) {
+	/**
+	 * Initialise is called once to load the initial values.
+	 * 
+	 * @param readings - a list of readings
+	 */
+	public void initialise(List<Reading> readings) {
 		LOGGER.entering(CLASS_NAME, "");
 		synchronized (this.readings) {
 			this.readings.addAll(readings);
 			Collections.sort(this.readings);
-			updateStorage();
 		}
 		LOGGER.exiting(CLASS_NAME, "");
 	}
@@ -110,6 +114,12 @@ public class ReadingsManager {
 		return copyList;
 	}
 
+	/**
+	 * Find entries for a given date.
+	 * 
+	 * @param date a LocalDate to be used for locating entries.
+	 * @return - an array of Readings.
+	 */
 	public Reading[] readingsFor(LocalDate date) {
 		LOGGER.entering(CLASS_NAME, "readingsFor");
 		List<Reading> list = readings.stream().filter((r) -> r.date().equals(date)).collect(Collectors.toList());
@@ -118,11 +128,28 @@ public class ReadingsManager {
 		return result;
 	}
 
+	/**
+	 * Find how many entries exist for a given date.
+	 * 
+	 * @param date a LocalDate to be used for locating entries.
+	 * @return - a count of entries for that date..
+	 */
 	public long countEntries(LocalDate date) {
 		LOGGER.entering(CLASS_NAME, "countEntries");
 		long count = readings.stream().filter((r) -> r.date().equals(date)).count();
 		LOGGER.exiting(CLASS_NAME, "countEntries", count);
 		return count;
+	}
+
+	/**
+	 * Find the file that stores the readings.
+	 * 
+	 * @return - the file used to store the readings.
+	 */
+	public File dataFile() {
+		LOGGER.entering(CLASS_NAME, "");
+		LOGGER.exiting(CLASS_NAME, "");
+		return dataFile;
 	}
 
 	private void updateStorage() {
