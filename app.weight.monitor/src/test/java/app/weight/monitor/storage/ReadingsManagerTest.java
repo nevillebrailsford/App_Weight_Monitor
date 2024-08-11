@@ -84,4 +84,13 @@ class ReadingsManagerTest extends BaseTest {
 		assertEquals(3, ReadingsManager.instance().readings().size());
 		assertEquals(2, ReadingsManager.instance().readingsFor(LocalDate.now()).length);
 	}
+
+	@Test
+	void testDeleteAReading() throws Exception {
+		addAReading();
+		assertEquals(1, ReadingsManager.instance().readings().size());
+		deleteAReading();
+		assertEquals(0, ReadingsManager.instance().readings().size());
+
+	}
 }

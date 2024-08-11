@@ -89,6 +89,27 @@ public class ReadingsManager {
 	}
 
 	/**
+	 * Remove a reading from the currently held readings.
+	 * 
+	 * @param reading - the reading to be removed.
+	 */
+	public void deleteReading(Reading reading) {
+		LOGGER.entering(CLASS_NAME, "deleteReading", reading);
+		if (reading == null) {
+			IllegalArgumentException exc = new IllegalArgumentException("ReadingManager: reading is null");
+			updateFailed(exc);
+			LOGGER.throwing(CLASS_NAME, "deleteReading", exc);
+			LOGGER.exiting(CLASS_NAME, "deleteReading");
+			throw exc;
+		}
+		synchronized (readings) {
+			readings.remove(reading);
+			updateStorage();
+		}
+		LOGGER.exiting(CLASS_NAME, "deleteReading");
+	}
+
+	/**
 	 * Initialise is called once to load the initial values.
 	 * 
 	 * @param readings - a list of readings

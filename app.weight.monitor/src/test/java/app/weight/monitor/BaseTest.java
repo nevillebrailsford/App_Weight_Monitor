@@ -130,6 +130,13 @@ public class BaseTest {
 		}
 	}
 
+	protected void deleteAReading() throws Exception {
+		synchronized (waitForFinish) {
+			ReadingsManager.instance().deleteReading(reading);
+			waitForFinish.wait();
+		}
+	}
+
 	protected void clearReadings() throws Exception {
 		synchronized (waitForFinish) {
 			ReadingsManager.instance().clear();

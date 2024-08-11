@@ -32,6 +32,7 @@ import javax.swing.event.ListSelectionEvent;
 
 import com.toedter.calendar.JCalendar;
 
+import app.weight.change.AddReadingChange;
 import app.weight.monitor.Constants;
 import app.weight.monitor.model.Reading;
 import app.weight.monitor.storage.ReadingsLoad;
@@ -41,10 +42,13 @@ import application.base.app.Parameters;
 import application.base.app.gui.ColorProvider;
 import application.base.app.gui.ColoredPanel;
 import application.base.app.gui.GUIConstants;
+import application.change.Change;
+import application.change.ChangeManager;
 import application.definition.ApplicationConfiguration;
 import application.definition.ApplicationDefinition;
 import application.inifile.IniFile;
 import application.storage.StoreDetails;
+import application.thread.ThreadServices;
 
 /**
  * The application to record and monitor my weight readings.
@@ -56,6 +60,7 @@ public class WeightMonitor extends ApplicationBaseForGUI {
 	private static Logger LOGGER = null;
 
 	private JFrame parent;
+	private LocalDate selectedDate = LocalDate.now();
 
 	GridBagConstraints gbc;
 
@@ -226,7 +231,7 @@ public class WeightMonitor extends ApplicationBaseForGUI {
 		System.out.println("deleteButton");
 	}
 
-	protected void weightsListValueChanged(ListSelectionEvent event) {
+	private void weightsListValueChanged(ListSelectionEvent event) {
 		if (!event.getValueIsAdjusting()) {
 			if (weightsList.getSelectedIndex() == -1) {
 				deleteButton.setEnabled(false);
@@ -237,20 +242,35 @@ public class WeightMonitor extends ApplicationBaseForGUI {
 	}
 
 	private void addButtonActionPerformed(ActionEvent event) {
-		System.out.println("addButton");
+		String weight = weightTextField.getText();
+		Calendar cal = weightCalendar.getCalendar();
+		selectedDate = LocalDate.ofInstant(cal.toInstant(), ZoneId.systemDefault());
+		Reading newReading = new Reading(selectedDate, weight);
+		AddReadingChange addReadingChange = new AddReadingChange(newReading);
+		submitChange(addReadingChange);
 	}
 
 	private void weightTextFieldActionPerformed(ActionEvent event) {
 		addButton.doClick();
 	}
 
-	protected void weightCalendarPropertyChange(PropertyChangeEvent event) {
+	private void weightCalendarPropertyChange(PropertyChangeEvent event) {
+		selectedDate = LocalDate.now();
 		if (event.getNewValue() != null) {
 			if (event.getNewValue() instanceof Calendar) {
 				Calendar cal = (Calendar) event.getNewValue();
-				LocalDate.ofInstant(cal.toInstant(), ZoneId.systemDefault());
+				selectedDate = LocalDate.ofInstant(cal.toInstant(), ZoneId.systemDefault());
 			}
 		}
+		addButton.setEnabled(validateWeight());
+	}
+
+	private void submitChange(Change change) {
+		LOGGER.entering(CLASS_NAME, "submitChange");
+		ThreadServices.instance().executor().submit(() -> {
+			ChangeManager.instance().execute(change);
+		});
+		LOGGER.exiting(CLASS_NAME, "submitChange");
 	}
 
 	private void layoutComponents() {
