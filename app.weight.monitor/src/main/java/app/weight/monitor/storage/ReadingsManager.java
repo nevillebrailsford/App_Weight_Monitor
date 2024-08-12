@@ -2,11 +2,17 @@ package app.weight.monitor.storage;
 
 import java.io.File;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import javax.swing.ListModel;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 
 import app.weight.monitor.model.Reading;
 import application.definition.ApplicationConfiguration;
@@ -16,9 +22,11 @@ import application.storage.Storage;
  * ReadingManager provides the interface to the backing storage for the weight
  * monitor application.
  */
-public class ReadingsManager {
+public class ReadingsManager implements ListModel<String> {
 	private static final String CLASS_NAME = ReadingsManager.class.getName();
 	private static final Logger LOGGER = ApplicationConfiguration.logger();
+	private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+	private Vector<ListDataListener> listDataListeners = new Vector<ListDataListener>();
 
 	private static ReadingsManager instance = null;
 
@@ -62,6 +70,7 @@ public class ReadingsManager {
 		synchronized (readings) {
 			readings.clear();
 			updateStorage();
+			fireListChanged();
 		}
 		LOGGER.exiting(CLASS_NAME, "clear");
 	}
@@ -84,8 +93,16 @@ public class ReadingsManager {
 			readings.add(reading);
 			Collections.sort(this.readings);
 			updateStorage();
+			fireListChanged();
 		}
 		LOGGER.exiting(CLASS_NAME, "addReading");
+	}
+
+	public Reading reading(int index) {
+		LOGGER.entering(CLASS_NAME, "reading", index);
+		Reading reading = readings.get(index);
+		LOGGER.exiting(CLASS_NAME, "reading", reading);
+		return reading;
 	}
 
 	/**
@@ -105,6 +122,7 @@ public class ReadingsManager {
 		synchronized (readings) {
 			readings.remove(reading);
 			updateStorage();
+			fireListChanged();
 		}
 		LOGGER.exiting(CLASS_NAME, "deleteReading");
 	}
@@ -204,5 +222,37 @@ public class ReadingsManager {
 		}
 		LOGGER.exiting(CLASS_NAME, "", modelDirectory);
 		return modelDirectory;
+	}
+
+	// ListModel implemntation
+
+	@Override
+	public int getSize() {
+		return readings.size();
+	}
+
+	@Override
+	public String getElementAt(int index) {
+		Reading reading = readings.get(index);
+		return reading.date().format(dateFormatter) + "       " + reading.weight();
+	}
+
+	@Override
+	public void addListDataListener(ListDataListener l) {
+		listDataListeners.addElement(l);
+	}
+
+	@Override
+	public void removeListDataListener(ListDataListener l) {
+		listDataListeners.removeElement(l);
+	}
+
+	private void fireListChanged() {
+		LOGGER.entering(CLASS_NAME, "fireListChanged");
+		ListDataEvent e = new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, getSize());
+		for (ListDataListener ldl : listDataListeners) {
+			ldl.contentsChanged(e);
+		}
+		LOGGER.exiting(CLASS_NAME, "fireTreeStructureChanged");
 	}
 }

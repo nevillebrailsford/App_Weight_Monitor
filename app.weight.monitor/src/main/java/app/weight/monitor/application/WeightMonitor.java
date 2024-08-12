@@ -16,7 +16,6 @@ import java.util.Optional;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -26,13 +25,17 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ListModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 
 import com.toedter.calendar.JCalendar;
 
 import app.weight.change.AddReadingChange;
+import app.weight.change.RemoveReadingChange;
 import app.weight.monitor.Constants;
 import app.weight.monitor.model.Reading;
 import app.weight.monitor.storage.ReadingsLoad;
@@ -53,7 +56,7 @@ import application.thread.ThreadServices;
 /**
  * The application to record and monitor my weight readings.
  */
-public class WeightMonitor extends ApplicationBaseForGUI {
+public class WeightMonitor extends ApplicationBaseForGUI implements ListDataListener {
 	private static final long serialVersionUID = 1L;
 	private static final String CLASS_NAME = WeightMonitor.class.getName();
 
@@ -78,7 +81,7 @@ public class WeightMonitor extends ApplicationBaseForGUI {
 	JLabel weightsListLabel = new JLabel();
 	JScrollPane weightsScrollPane = new JScrollPane();
 	JList<String> weightsList = new JList<>();
-	static DefaultListModel<String> weightsListModel = new DefaultListModel<>();
+	ListModel<String> weightsListModel = null;
 	JButton deleteButton = new JButton();
 
 	@Override
@@ -128,6 +131,8 @@ public class WeightMonitor extends ApplicationBaseForGUI {
 		this.parent = parent;
 		System.out.println(
 				"Application " + ApplicationConfiguration.applicationDefinition().applicationName() + " is starting");
+		weightsListModel = ReadingsManager.instance();
+		ReadingsManager.instance().addListDataListener(this);
 		this.parent.setLayout(new GridBagLayout());
 		configureComponents();
 		layoutComponents();
@@ -228,7 +233,9 @@ public class WeightMonitor extends ApplicationBaseForGUI {
 	}
 
 	private void deleteButtonActionPerformed(ActionEvent event) {
-		System.out.println("deleteButton");
+		Reading selectedReading = ReadingsManager.instance().reading(weightsList.getSelectedIndex());
+		RemoveReadingChange change = new RemoveReadingChange(selectedReading);
+		submitChange(change);
 	}
 
 	private void weightsListValueChanged(ListSelectionEvent event) {
@@ -345,19 +352,13 @@ public class WeightMonitor extends ApplicationBaseForGUI {
 	private void loadData() {
 		initializeData();
 		fileTextArea.setText(ReadingsManager.instance().dataFile().getAbsolutePath());
-		for (Reading reading : ReadingsManager.instance().readings()) {
-			weightsListModel.addElement(reading.toString());
-		}
 		weightsList.ensureIndexIsVisible(ReadingsManager.instance().readings().size() - 1);
 	}
 
 	private void initializeData() {
 		weightTabbedPane.setSelectedIndex(0);
 		weightCalendar.setDate(new Date());
-		weightsListModel.clear();
 		weightsList.setModel(weightsListModel);
-		fileTextArea.setText("New File");
-		weightTextField.setText("");
 		weightTextField.requestFocus();
 	}
 
@@ -372,5 +373,20 @@ public class WeightMonitor extends ApplicationBaseForGUI {
 
 	class WeightPlotPanel extends JPanel {
 
+	}
+
+	// ListDataListener implementation
+
+	@Override
+	public void intervalAdded(ListDataEvent e) {
+	}
+
+	@Override
+	public void intervalRemoved(ListDataEvent e) {
+	}
+
+	@Override
+	public void contentsChanged(ListDataEvent e) {
+		weightsList.ensureIndexIsVisible(ReadingsManager.instance().readings().size() - 1);
 	}
 }
