@@ -15,6 +15,9 @@ import application.audit.AuditService;
 import application.definition.ApplicationConfiguration;
 import application.storage.AbstractLoadData;
 
+/**
+ * Load readings from backing storage.
+ */
 public class ReadingsLoad extends AbstractLoadData {
 	private static final String CLASS_NAME = ReadingsLoad.class.getName();
 	private static final Logger LOGGER = ApplicationConfiguration.logger();

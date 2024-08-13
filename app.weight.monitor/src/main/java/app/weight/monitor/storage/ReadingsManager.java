@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
+import javax.swing.table.AbstractTableModel;
 
 import app.weight.monitor.model.Reading;
 import application.definition.ApplicationConfiguration;
@@ -22,13 +23,18 @@ import application.storage.Storage;
  * ReadingManager provides the interface to the backing storage for the weight
  * monitor application.
  */
-public class ReadingsManager implements ListModel<String> {
+public class ReadingsManager extends AbstractTableModel implements ListModel<String> {
+	private static final long serialVersionUID = 1L;
 	private static final String CLASS_NAME = ReadingsManager.class.getName();
 	private static final Logger LOGGER = ApplicationConfiguration.logger();
 	private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-	private Vector<ListDataListener> listDataListeners = new Vector<ListDataListener>();
 
 	private static ReadingsManager instance = null;
+	private static String[] COLUMNS = { "Date", "Weight" };
+	private static final int DATE = 0;
+	private static final int WEIGHT = 1;
+
+	private Vector<ListDataListener> listDataListeners = new Vector<ListDataListener>();
 
 	private List<Reading> readings = new ArrayList<>();
 
@@ -93,11 +99,16 @@ public class ReadingsManager implements ListModel<String> {
 			readings.add(reading);
 			Collections.sort(this.readings);
 			updateStorage();
-			fireListChanged();
 		}
 		LOGGER.exiting(CLASS_NAME, "addReading");
 	}
 
+	/**
+	 * Get the reading at a certain index.
+	 * 
+	 * @param index - the index into the history of readings.
+	 * @return - the requested reading
+	 */
 	public Reading reading(int index) {
 		LOGGER.entering(CLASS_NAME, "reading", index);
 		Reading reading = readings.get(index);
@@ -122,7 +133,6 @@ public class ReadingsManager implements ListModel<String> {
 		synchronized (readings) {
 			readings.remove(reading);
 			updateStorage();
-			fireListChanged();
 		}
 		LOGGER.exiting(CLASS_NAME, "deleteReading");
 	}
@@ -194,6 +204,8 @@ public class ReadingsManager implements ListModel<String> {
 	private void updateStorage() {
 		LOGGER.entering(CLASS_NAME, "updateStorage");
 		storage.storeData(readingsStore);
+		fireListChanged();
+		fireTableDataChanged();
 		LOGGER.exiting(CLASS_NAME, "updateStorage");
 	}
 
@@ -255,4 +267,32 @@ public class ReadingsManager implements ListModel<String> {
 		}
 		LOGGER.exiting(CLASS_NAME, "fireTreeStructureChanged");
 	}
+
+	// TableModel implementation
+
+	@Override
+	public int getRowCount() {
+		return readings.size();
+	}
+
+	@Override
+	public int getColumnCount() {
+		return COLUMNS.length;
+	}
+
+	@Override
+	public Object getValueAt(int rowIndex, int columnIndex) {
+		Reading reading = readings.get(rowIndex);
+		String result = "Unknown";
+		switch (columnIndex) {
+			case DATE:
+				result = reading.date().format(dateFormatter);
+				break;
+			case WEIGHT:
+				result = reading.weight();
+				break;
+		}
+		return result;
+	}
+
 }

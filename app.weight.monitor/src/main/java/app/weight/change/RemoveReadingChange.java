@@ -8,12 +8,20 @@ import application.change.AbstractChange;
 import application.change.Failure;
 import application.definition.ApplicationConfiguration;
 
+/**
+ * A change request that will remove a reading from the history of readings.
+ */
 public class RemoveReadingChange extends AbstractChange {
 	private static final String CLASS_NAME = RemoveReadingChange.class.getName();
 	private static final Logger LOGGER = ApplicationConfiguration.logger();
 
 	private Reading reading;
 
+	/**
+	 * Create the change request.
+	 * 
+	 * @param reading - the reading to be removed.
+	 */
 	public RemoveReadingChange(Reading reading) {
 		this.reading = reading;
 	}

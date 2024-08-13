@@ -11,6 +11,9 @@ import app.weight.monitor.model.Reading;
 import application.definition.ApplicationConfiguration;
 import application.storage.AbstractStoreData;
 
+/**
+ * Write the current history of readings to the backing store.
+ */
 public class ReadingsStore extends AbstractStoreData {
 	private static final String CLASS_NAME = ReadingsStore.class.getName();
 	private static final Logger LOGGER = ApplicationConfiguration.logger();

@@ -8,12 +8,20 @@ import application.change.AbstractChange;
 import application.change.Failure;
 import application.definition.ApplicationConfiguration;
 
+/**
+ * A change request that will add a reading to the history of readings.
+ */
 public class AddReadingChange extends AbstractChange {
 	private static final String CLASS_NAME = AddReadingChange.class.getName();
 	private static final Logger LOGGER = ApplicationConfiguration.logger();
 
 	private Reading reading;
 
+	/**
+	 * Create the change request.
+	 * 
+	 * @param reading - the reading to be added.
+	 */
 	public AddReadingChange(Reading reading) {
 		this.reading = reading;
 	}
