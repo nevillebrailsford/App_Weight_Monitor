@@ -31,15 +31,16 @@ import javax.swing.event.ListSelectionEvent;
 
 import com.toedter.calendar.JCalendar;
 
-import app.weight.change.AddReadingChange;
-import app.weight.change.RemoveReadingChange;
 import app.weight.monitor.actions.ActionFactory;
 import app.weight.monitor.application.IApplication;
+import app.weight.monitor.change.AddReadingChange;
+import app.weight.monitor.change.RemoveReadingChange;
 import app.weight.monitor.model.Reading;
 import app.weight.monitor.storage.ReadingsManager;
 import application.base.app.gui.ColoredPanel;
 import application.change.Change;
 import application.change.ChangeManager;
+import application.replicate.CopyAndPaste;
 import application.thread.ThreadServices;
 
 /**
@@ -82,12 +83,34 @@ public class EditorPanel extends ColoredPanel implements ListDataListener {
 		layoutComponents();
 		installKeyMap();
 		initializeData();
+		weightsListModel.addListDataListener(this);
 		weightTextField.requestFocus();
 	}
 
 	@Override
 	public void requestFocus() {
 		weightTextField.requestFocus();
+	}
+
+	public void undoAction() {
+		ChangeManager.instance().undo();
+	}
+
+	public void redoAction() {
+		ChangeManager.instance().redo();
+	}
+
+	public void copyAction() {
+		CopyAndPaste.instance().copy(weightTextField.getText());
+	}
+
+	public void pasteAction() {
+		String text = (String) CopyAndPaste.instance().paste();
+		weightTextField.setText(text);
+	}
+
+	public void deleteAction() {
+		weightTextField.setText("");
 	}
 
 	private void configureComponents() {
@@ -233,8 +256,10 @@ public class EditorPanel extends ColoredPanel implements ListDataListener {
 		if (!event.getValueIsAdjusting()) {
 			if (weightsList.getSelectedIndex() == -1) {
 				deleteButton.setEnabled(false);
+				actionFactory.deleteAction().setEnabled(false);
 			} else {
 				deleteButton.setEnabled(true);
+				actionFactory.deleteAction().setEnabled(true);
 			}
 		}
 	}

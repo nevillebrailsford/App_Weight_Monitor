@@ -1,4 +1,4 @@
-package app.weight.change;
+package app.weight.monitor.change;
 
 import java.util.logging.Logger;
 
@@ -9,10 +9,10 @@ import application.change.Failure;
 import application.definition.ApplicationConfiguration;
 
 /**
- * A change request that will add a reading to the history of readings.
+ * A change request that will remove a reading from the history of readings.
  */
-public class AddReadingChange extends AbstractChange {
-	private static final String CLASS_NAME = AddReadingChange.class.getName();
+public class RemoveReadingChange extends AbstractChange {
+	private static final String CLASS_NAME = RemoveReadingChange.class.getName();
 	private static final Logger LOGGER = ApplicationConfiguration.logger();
 
 	private Reading reading;
@@ -20,9 +20,9 @@ public class AddReadingChange extends AbstractChange {
 	/**
 	 * Create the change request.
 	 * 
-	 * @param reading - the reading to be added.
+	 * @param reading - the reading to be removed.
 	 */
-	public AddReadingChange(Reading reading) {
+	public RemoveReadingChange(Reading reading) {
 		this.reading = reading;
 	}
 
@@ -36,14 +36,14 @@ public class AddReadingChange extends AbstractChange {
 	@Override
 	protected void redoHook() throws Failure {
 		LOGGER.entering(CLASS_NAME, "redoHook");
-		ReadingsManager.instance().addReading(reading);
+		ReadingsManager.instance().deleteReading(reading);
 		LOGGER.exiting(CLASS_NAME, "redoHook");
 	}
 
 	@Override
 	protected void undoHook() throws Failure {
 		LOGGER.entering(CLASS_NAME, "undoHook");
-		ReadingsManager.instance().deleteReading(reading);
+		ReadingsManager.instance().addReading(reading);
 		LOGGER.exiting(CLASS_NAME, "undoHook");
 	}
 }

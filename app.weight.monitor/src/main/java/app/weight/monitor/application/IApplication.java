@@ -30,4 +30,14 @@ public interface IApplication {
 	 */
 	void undoAction();
 
+	/**
+	 * Change manager state has been updated.
+	 */
+	void changeStateChange();
+
+	/**
+	 * Copy manager state has changed.
+	 */
+	void copyStateChange();
+
 }

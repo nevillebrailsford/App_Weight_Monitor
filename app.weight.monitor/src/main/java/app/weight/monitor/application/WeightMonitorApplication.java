@@ -6,26 +6,28 @@ import java.awt.GridBagLayout;
 import java.util.logging.Logger;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import app.weight.monitor.Constants;
+import app.weight.monitor.actions.ActionFactory;
 import app.weight.monitor.application.chart.WeightGraph;
 import app.weight.monitor.application.gui.EditorPanel;
 import app.weight.monitor.storage.ReadingsLoad;
 import application.base.app.ApplicationBaseForGUI;
 import application.base.app.Parameters;
+import application.change.ChangeManager;
 import application.definition.ApplicationConfiguration;
 import application.definition.ApplicationDefinition;
+import application.replicate.CopyAndPaste;
 import application.storage.StoreDetails;
 
 /**
  * The application to record and monitor my weight readings.
  */
-public class WeightMonitor extends ApplicationBaseForGUI implements IApplication {
+public class WeightMonitorApplication extends ApplicationBaseForGUI implements IApplication {
 
 	private static final long serialVersionUID = 1L;
-	private static final String CLASS_NAME = WeightMonitor.class.getName();
+	private static final String CLASS_NAME = WeightMonitorApplication.class.getName();
 
 	private static Logger LOGGER = null;
 
@@ -34,7 +36,7 @@ public class WeightMonitor extends ApplicationBaseForGUI implements IApplication
 	GridBagConstraints gbc;
 
 	JTabbedPane weightTabbedPane = new JTabbedPane();
-	JPanel editorPanel = null;
+	EditorPanel editorPanel = null;
 	WeightGraph plotPanel = new WeightGraph();
 
 	@Override
@@ -61,6 +63,8 @@ public class WeightMonitor extends ApplicationBaseForGUI implements IApplication
 		configureComponents();
 		layoutComponents();
 		loadData();
+		new WeightMonitorStateListener(this);
+		new WeightMonitorCopyListener(this);
 		pack();
 		editorPanel.requestFocus();
 		LOGGER.exiting(CLASS_NAME, "start");
@@ -111,32 +115,53 @@ public class WeightMonitor extends ApplicationBaseForGUI implements IApplication
 
 	private void initializeData() {
 		weightTabbedPane.setSelectedIndex(0);
+		setDoableActions();
+	}
+
+	private void setDoableActions() {
+		ActionFactory.instance(this).undoAction().setEnabled(ChangeManager.instance().undoable());
+		ActionFactory.instance(this).redoAction().setEnabled(ChangeManager.instance().redoable());
+	}
+
+	private void setCopyableActions() {
+		ActionFactory.instance(this).pasteAction().setEnabled(CopyAndPaste.instance().paste() != null);
 	}
 
 	// IApplication implementation
 
 	@Override
 	public void redoAction() {
-		System.out.println("redo");
+		editorPanel.redoAction();
 	}
 
 	@Override
 	public void undoAction() {
-		System.out.println("undo");
+		editorPanel.undoAction();
 	}
 
 	@Override
 	public void copyAction() {
-		System.out.println("copy");
+		editorPanel.copyAction();
 	}
 
 	@Override
 	public void pasteAction() {
-		System.out.println("paste");
+		editorPanel.pasteAction();
 	}
 
 	@Override
 	public void deleteAction() {
-		System.out.println("delete");
+		editorPanel.deleteAction();
 	}
+
+	@Override
+	public void changeStateChange() {
+		setDoableActions();
+	}
+
+	@Override
+	public void copyStateChange() {
+		setCopyableActions();
+	}
+
 }

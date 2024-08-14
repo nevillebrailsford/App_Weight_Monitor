@@ -46,48 +46,64 @@ public class ActionFactory {
 
 	/**
 	 * Obtain the delete action.
+	 * <p>
+	 * The action is created in the disabled state
+	 * </p>
 	 * 
 	 * @return - a delete action.
 	 */
 	public DeleteAction deleteAction() {
 		if (deleteAction == null) {
 			deleteAction = new DeleteAction(application);
+			deleteAction.setEnabled(false);
 		}
 		return deleteAction;
 	}
 
 	/**
 	 * Obtain the paste action.
+	 * <p>
+	 * The action is created in the disabled state
+	 * </p>
 	 * 
 	 * @return - a paste action.
 	 */
 	public PasteAction pasteAction() {
 		if (pasteAction == null) {
 			pasteAction = new PasteAction(application);
+			pasteAction.setEnabled(false);
 		}
 		return pasteAction;
 	}
 
 	/**
 	 * Obtain the redo action.
+	 * <p>
+	 * The action is created in the disabled state
+	 * </p>
 	 * 
 	 * @return - a redo action.
 	 */
 	public RedoAction redoAction() {
 		if (redoAction == null) {
 			redoAction = new RedoAction(application);
+			redoAction.setEnabled(false);
 		}
 		return redoAction;
 	}
 
 	/**
 	 * Obtain the undo action.
+	 * <p>
+	 * The action is created in the disabled state
+	 * </p>
 	 * 
 	 * @return - a undo action.
 	 */
 	public UndoAction undoAction() {
 		if (undoAction == null) {
 			undoAction = new UndoAction(application);
+			undoAction.setEnabled(false);
 		}
 		return undoAction;
 	}
