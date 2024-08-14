@@ -87,8 +87,10 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 	 * Main entry point for the application.
 	 * <p>
 	 * The parameters that the application will read are:
-	 * <li>--name=x where x is the name to be used by the application.</li>
-	 * <li>--dir=x where x is the path to the working directory.</li>
+	 * <p>
+	 * --name=x where x is the name to be used by the application.
+	 * <p>
+	 * --dir=x where x is the path to the working directory.
 	 * 
 	 * @param args - any number of arguments passed in from command line. The values
 	 *             must include the values for --name and --dir.
@@ -99,39 +101,50 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 	}
 
 	private void configureComponents() {
+		LOGGER.entering(CLASS_NAME, "configureComponents");
 		weightTabbedPane.setPreferredSize(new Dimension(500, 400));
 		weightTabbedPane.addTab("Weight Editor", editorPanel);
 		weightTabbedPane.addTab("Weight Plot", plotPanel);
-
+		LOGGER.exiting(CLASS_NAME, "configureComponents");
 	}
 
 	private void layoutComponents() {
+		LOGGER.entering(CLASS_NAME, "layoutComponents");
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		parent.add(weightTabbedPane, gbc);
-
+		LOGGER.exiting(CLASS_NAME, "layoutComponents");
 	}
 
 	private void loadData() {
+		LOGGER.entering(CLASS_NAME, "loadData");
 		initializeData();
+		LOGGER.exiting(CLASS_NAME, "loadData");
 	}
 
 	private void initializeData() {
+		LOGGER.entering(CLASS_NAME, "initializeData");
 		weightTabbedPane.setSelectedIndex(0);
 		setDoableActions();
+		LOGGER.exiting(CLASS_NAME, "initializeData");
 	}
 
 	private void setDoableActions() {
+		LOGGER.entering(CLASS_NAME, "setDoableActions");
 		ActionFactory.instance(this).undoAction().setEnabled(ChangeManager.instance().undoable());
 		ActionFactory.instance(this).redoAction().setEnabled(ChangeManager.instance().redoable());
+		LOGGER.exiting(CLASS_NAME, "setDoableActions");
 	}
 
 	private void setCopyableActions() {
+		LOGGER.entering(CLASS_NAME, "setCopyableActions");
 		ActionFactory.instance(this).pasteAction().setEnabled(CopyAndPaste.instance().paste() != null);
+		LOGGER.exiting(CLASS_NAME, "setCopyableActions");
 	}
 
 	private String getBuildInformation(String applicationName) {
+		LOGGER.entering(applicationName, "getBuildInformation");
 		String result = "";
 		StringBuilder builder = new StringBuilder(applicationName);
 		try {
@@ -144,6 +157,7 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 			LOGGER.fine("Caught exception: " + e.getMessage());
 		}
 		result = builder.toString();
+		LOGGER.exiting(applicationName, "getBuildInformation", result);
 		return result;
 	}
 

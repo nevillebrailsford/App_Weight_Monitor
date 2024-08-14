@@ -236,7 +236,7 @@ public class ReadingsManager extends AbstractTableModel implements ListModel<Str
 		return modelDirectory;
 	}
 
-	// ListModel implemntation
+	// ListModel implementation
 
 	@Override
 	public int getSize() {
@@ -282,6 +282,7 @@ public class ReadingsManager extends AbstractTableModel implements ListModel<Str
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
+		LOGGER.entering(CLASS_NAME, "getValueAt", new Object[] { rowIndex, columnIndex });
 		Reading reading = readings.get(rowIndex);
 		String result = "Unknown";
 		switch (columnIndex) {
@@ -292,6 +293,7 @@ public class ReadingsManager extends AbstractTableModel implements ListModel<Str
 				result = reading.weight();
 				break;
 		}
+		LOGGER.exiting(CLASS_NAME, "getValueAt", result);
 		return result;
 	}
 

@@ -1,14 +1,22 @@
 package app.weight.monitor.application.gui;
 
+import java.util.logging.Logger;
+
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
 import app.weight.monitor.actions.ActionFactory;
 import app.weight.monitor.application.IApplication;
+import application.definition.ApplicationConfiguration;
 
+/**
+ * This class provides the menu bar for the weight monitor application.
+ */
 public class WeightMonitorMenuBar extends JMenuBar {
 	private static final long serialVersionUID = 1L;
+	private static final String CLASS_NAME = EditorPanel.class.getName();
+	private static final Logger LOGGER = ApplicationConfiguration.logger();
 
 	private JMenu fileMenu = new JMenu("File");
 	private JMenuItem preferencesItem = null;
@@ -24,7 +32,14 @@ public class WeightMonitorMenuBar extends JMenuBar {
 	private JMenu helpMenu = new JMenu("Help");
 	private JMenuItem aboutItem = null;
 
+	/**
+	 * Create the menu bar using the application.
+	 * 
+	 * @param application - the application.
+	 */
 	public WeightMonitorMenuBar(IApplication application) {
+		super();
+		LOGGER.entering(CLASS_NAME, "init");
 		preferencesItem = new JMenuItem(ActionFactory.instance(application).preferencesAction());
 		exitItem = new JMenuItem(ActionFactory.instance(application).exitAction());
 		fileMenu.add(preferencesItem);
@@ -48,5 +63,6 @@ public class WeightMonitorMenuBar extends JMenuBar {
 		aboutItem = new JMenuItem(ActionFactory.instance(application).helpAboutAction());
 		helpMenu.add(aboutItem);
 		add(helpMenu);
+		LOGGER.exiting(CLASS_NAME, "init");
 	}
 }

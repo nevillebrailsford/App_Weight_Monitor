@@ -12,6 +12,9 @@ import app.weight.monitor.application.IApplication;
 public class PasteAction extends AbstractAction {
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * The application.
+	 */
 	private IApplication application;
 
 	/**

@@ -39,12 +39,16 @@ public class ActionFactory {
 
 	/**
 	 * Obtain the copy action.
+	 * <p>
+	 * The action is created in the disabled state
+	 * </p>
 	 * 
 	 * @return - a copy action.
 	 */
 	public CopyAction copyAction() {
 		if (copyAction == null) {
 			copyAction = new CopyAction(application);
+			copyAction.setEnabled(false);
 		}
 		return copyAction;
 	}

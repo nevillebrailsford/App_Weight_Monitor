@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -40,6 +41,7 @@ import app.weight.monitor.storage.ReadingsManager;
 import application.base.app.gui.ColoredPanel;
 import application.change.Change;
 import application.change.ChangeManager;
+import application.definition.ApplicationConfiguration;
 import application.replicate.CopyAndPaste;
 import application.thread.ThreadServices;
 
@@ -48,6 +50,8 @@ import application.thread.ThreadServices;
  */
 public class EditorPanel extends ColoredPanel implements ListDataListener {
 	private static final long serialVersionUID = 1L;
+	private static final String CLASS_NAME = EditorPanel.class.getName();
+	private static final Logger LOGGER = ApplicationConfiguration.logger();
 
 	private LocalDate selectedDate = LocalDate.now();
 
@@ -75,6 +79,7 @@ public class EditorPanel extends ColoredPanel implements ListDataListener {
 	 */
 	public EditorPanel(IApplication application) {
 		super();
+		LOGGER.entering(CLASS_NAME, "init");
 		actionFactory = ActionFactory.instance(application);
 		weightsListModel = ReadingsManager.instance();
 		ReadingsManager.instance().addListDataListener(this);
@@ -85,6 +90,7 @@ public class EditorPanel extends ColoredPanel implements ListDataListener {
 		initializeData();
 		weightsListModel.addListDataListener(this);
 		weightTextField.requestFocus();
+		LOGGER.exiting(CLASS_NAME, "init");
 	}
 
 	@Override
@@ -92,28 +98,46 @@ public class EditorPanel extends ColoredPanel implements ListDataListener {
 		weightTextField.requestFocus();
 	}
 
+	/**
+	 * Undo the last add or delete action.
+	 */
 	public void undoAction() {
 		ChangeManager.instance().undo();
 	}
 
+	/**
+	 * Redo the action last undone.
+	 */
 	public void redoAction() {
 		ChangeManager.instance().redo();
 	}
 
+	/**
+	 * Copy text from text area into copy and paste manager.
+	 */
 	public void copyAction() {
 		CopyAndPaste.instance().copy(weightTextField.getText());
 	}
 
+	/**
+	 * Get the text from the copy and paste manager and copy it into the text area,
+	 */
 	public void pasteAction() {
 		String text = (String) CopyAndPaste.instance().paste();
 		weightTextField.setText(text);
 	}
 
+	/**
+	 * Delete text from text area. But first copy the contents to the copy and paste
+	 * manager.
+	 */
 	public void deleteAction() {
+		copyAction();
 		weightTextField.setText("");
 	}
 
 	private void configureComponents() {
+		LOGGER.entering(CLASS_NAME, "configureComponents");
 		fileLabel.setText("Current Weight File");
 		fileLabel.setFont(new Font("Arial", Font.BOLD, 14));
 		fileTextArea.setPreferredSize(new Dimension(220, 50));
@@ -139,16 +163,22 @@ public class EditorPanel extends ColoredPanel implements ListDataListener {
 			@Override
 			public void removeUpdate(DocumentEvent e) {
 				addButton.setEnabled(validateWeight());
+				actionFactory.deleteAction().setEnabled(!weightTextField.getText().isEmpty());
+				actionFactory.copyAction().setEnabled(!weightTextField.getText().isEmpty());
 			}
 
 			@Override
 			public void insertUpdate(DocumentEvent e) {
 				addButton.setEnabled(validateWeight());
+				actionFactory.deleteAction().setEnabled(!weightTextField.getText().isEmpty());
+				actionFactory.copyAction().setEnabled(!weightTextField.getText().isEmpty());
 			}
 
 			@Override
 			public void changedUpdate(DocumentEvent e) {
 				addButton.setEnabled(validateWeight());
+				actionFactory.deleteAction().setEnabled(!weightTextField.getText().isEmpty());
+				actionFactory.copyAction().setEnabled(!weightTextField.getText().isEmpty());
 			}
 		});
 
@@ -171,9 +201,11 @@ public class EditorPanel extends ColoredPanel implements ListDataListener {
 			deleteButtonActionPerformed(event);
 		});
 		deleteButton.setEnabled(false);
+		LOGGER.exiting(CLASS_NAME, "configureComponents");
 	}
 
 	private void layoutComponents() {
+		LOGGER.entering(CLASS_NAME, "layoutComponents");
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
@@ -235,9 +267,11 @@ public class EditorPanel extends ColoredPanel implements ListDataListener {
 		gbc.insets = new Insets(10, 0, 0, 0);
 		gbc.anchor = GridBagConstraints.CENTER;
 		add(deleteButton, gbc);
+		LOGGER.exiting(CLASS_NAME, "layoutComponents");
 	}
 
 	private void weightCalendarPropertyChange(PropertyChangeEvent event) {
+		LOGGER.entering(CLASS_NAME, "weightCalendarPropertyChange");
 		selectedDate = LocalDate.now();
 		if (event.getNewValue() != null) {
 			if (event.getNewValue() instanceof Calendar) {
@@ -246,55 +280,70 @@ public class EditorPanel extends ColoredPanel implements ListDataListener {
 			}
 		}
 		addButton.setEnabled(validateWeight());
+		LOGGER.exiting(CLASS_NAME, "weightCalendarPropertyChange");
 	}
 
 	private void weightTextFieldActionPerformed(ActionEvent event) {
+		LOGGER.entering(CLASS_NAME, "weightTextFieldActionPerformed");
 		addButton.doClick();
+		LOGGER.exiting(CLASS_NAME, "weightTextFieldActionPerformed");
 	}
 
 	private void weightsListValueChanged(ListSelectionEvent event) {
+		LOGGER.entering(CLASS_NAME, "weightsListValueChanged");
 		if (!event.getValueIsAdjusting()) {
 			if (weightsList.getSelectedIndex() == -1) {
 				deleteButton.setEnabled(false);
-				actionFactory.deleteAction().setEnabled(false);
 			} else {
 				deleteButton.setEnabled(true);
-				actionFactory.deleteAction().setEnabled(true);
 			}
 		}
+		LOGGER.exiting(CLASS_NAME, "weightsListValueChanged");
 	}
 
 	private boolean validateWeight() {
+		LOGGER.entering(CLASS_NAME, "validateWeight");
 		String match = "^\\d*\\.?\\d+|\\d+\\.\\d*$";
 		String sel = weightTextField.getText();
+		boolean result = false;
 		if (sel == null || sel.isEmpty()) {
+			LOGGER.exiting(CLASS_NAME, "validateWeight", false);
 			return false;
 		}
-		return sel.matches(match);
+		result = sel.matches(match);
+		LOGGER.exiting(CLASS_NAME, "validateWeight", result);
+		return result;
 	}
 
 	private void addButtonActionPerformed(ActionEvent event) {
+		LOGGER.entering(CLASS_NAME, "addButtonActionPerformed");
 		String weight = weightTextField.getText();
 		Calendar cal = weightCalendar.getCalendar();
 		selectedDate = LocalDate.ofInstant(cal.toInstant(), ZoneId.systemDefault());
 		Reading newReading = new Reading(selectedDate, weight);
 		AddReadingChange addReadingChange = new AddReadingChange(newReading);
 		submitChange(addReadingChange);
+		LOGGER.exiting(CLASS_NAME, "addButtonActionPerformed");
 	}
 
 	private void submitChange(Change change) {
+		LOGGER.entering(CLASS_NAME, "submitChange");
 		ThreadServices.instance().executor().submit(() -> {
 			ChangeManager.instance().execute(change);
 		});
+		LOGGER.exiting(CLASS_NAME, "submitChange");
 	}
 
 	private void deleteButtonActionPerformed(ActionEvent event) {
+		LOGGER.entering(CLASS_NAME, "deleteButtonActionPerformed");
 		Reading selectedReading = ReadingsManager.instance().reading(weightsList.getSelectedIndex());
 		RemoveReadingChange change = new RemoveReadingChange(selectedReading);
 		submitChange(change);
+		LOGGER.exiting(CLASS_NAME, "deleteButtonActionPerformed");
 	}
 
 	private void installKeyMap() {
+		LOGGER.entering(CLASS_NAME, "installKeyMap");
 		weightTextField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK),
 				actionFactory.undoAction());
 		weightTextField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionEvent.CTRL_MASK),
@@ -305,13 +354,16 @@ public class EditorPanel extends ColoredPanel implements ListDataListener {
 				actionFactory.pasteAction());
 		weightTextField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.CTRL_MASK),
 				actionFactory.deleteAction());
+		LOGGER.exiting(CLASS_NAME, "installKeyMap");
 	}
 
 	private void initializeData() {
+		LOGGER.entering(CLASS_NAME, "initializeData");
 		weightCalendar.setDate(new Date());
 		weightsList.setModel(weightsListModel);
 		fileTextArea.setText(ReadingsManager.instance().dataFile().getAbsolutePath());
 		weightsList.ensureIndexIsVisible(ReadingsManager.instance().readings().size() - 1);
+		LOGGER.exiting(CLASS_NAME, "initializeData");
 	}
 
 	// ListDataListener implementation
@@ -326,7 +378,9 @@ public class EditorPanel extends ColoredPanel implements ListDataListener {
 
 	@Override
 	public void contentsChanged(ListDataEvent e) {
+		LOGGER.entering(CLASS_NAME, "contentsChanged");
 		weightsList.ensureIndexIsVisible(ReadingsManager.instance().readings().size() - 1);
+		LOGGER.exiting(CLASS_NAME, "contentsChanged");
 	}
 
 }
