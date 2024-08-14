@@ -6,15 +6,18 @@ import java.awt.GridBagLayout;
 import java.util.logging.Logger;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 
 import app.weight.monitor.Constants;
 import app.weight.monitor.actions.ActionFactory;
 import app.weight.monitor.application.chart.WeightGraph;
 import app.weight.monitor.application.gui.EditorPanel;
+import app.weight.monitor.application.gui.WeightMonitorMenuBar;
 import app.weight.monitor.storage.ReadingsLoad;
 import application.base.app.ApplicationBaseForGUI;
 import application.base.app.Parameters;
+import application.base.app.gui.PreferencesDialog;
 import application.change.ChangeManager;
 import application.definition.ApplicationConfiguration;
 import application.definition.ApplicationDefinition;
@@ -58,6 +61,7 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 		this.parent = parent;
 		System.out.println(
 				"Application " + ApplicationConfiguration.applicationDefinition().applicationName() + " is starting");
+		this.parent.setJMenuBar(new WeightMonitorMenuBar(this));
 		this.parent.setLayout(new GridBagLayout());
 		editorPanel = new EditorPanel(this);
 		configureComponents();
@@ -127,6 +131,22 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 		ActionFactory.instance(this).pasteAction().setEnabled(CopyAndPaste.instance().paste() != null);
 	}
 
+	private String getBuildInformation(String applicationName) {
+		String result = "";
+		StringBuilder builder = new StringBuilder(applicationName);
+		try {
+			builder.append("\nBuild: ").append(ApplicationDefinition.getFromManifest("Build-Number", getClass())
+					.orElse("Could not be determined"));
+			builder.append("\nBuild Date: ").append(
+					ApplicationDefinition.getFromManifest("Build-Date", getClass()).orElse("Could not be determined"));
+		} catch (Exception e) {
+			builder.append("\nUnable to gather build version and date information\ndue to exception " + e.getMessage());
+			LOGGER.fine("Caught exception: " + e.getMessage());
+		}
+		result = builder.toString();
+		return result;
+	}
+
 	// IApplication implementation
 
 	@Override
@@ -162,6 +182,27 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 	@Override
 	public void copyStateChange() {
 		setCopyableActions();
+	}
+
+	@Override
+	public void exitAction() {
+		shutdown();
+	}
+
+	@Override
+	public void preferencesAction() {
+		PreferencesDialog dialog = new PreferencesDialog(parent);
+		dialog.setVisible(true);
+		dialog.dispose();
+
+	}
+
+	@Override
+	public void helpAboutAction() {
+		String applicationName = ApplicationConfiguration.applicationDefinition().applicationName();
+		String title = "About " + applicationName;
+		String message = getBuildInformation(applicationName);
+		JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
 	}
 
 }

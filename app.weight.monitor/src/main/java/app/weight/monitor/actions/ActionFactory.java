@@ -12,6 +12,11 @@ public class ActionFactory {
 	private PasteAction pasteAction = null;
 	private DeleteAction deleteAction = null;
 
+	private ExitAction exitAction = null;
+	private PreferencesAction preferencesAction = null;
+
+	private HelpAboutAction helpAboutAction = null;
+
 	private static ActionFactory instance = null;
 	private IApplication application;
 
@@ -107,4 +112,41 @@ public class ActionFactory {
 		}
 		return undoAction;
 	}
+
+	/**
+	 * Obtain the exit action.
+	 * 
+	 * @return - an exit action.
+	 */
+	public ExitAction exitAction() {
+		if (exitAction == null) {
+			exitAction = new ExitAction(application);
+		}
+		return exitAction;
+	}
+
+	/**
+	 * Obtain the preferences action.
+	 * 
+	 * @return - a preferences action.
+	 */
+	public PreferencesAction preferencesAction() {
+		if (preferencesAction == null) {
+			preferencesAction = new PreferencesAction(application);
+		}
+		return preferencesAction;
+	}
+
+	/**
+	 * Obtain the help about action.
+	 * 
+	 * @return - a help about action.
+	 */
+	public HelpAboutAction helpAboutAction() {
+		if (helpAboutAction == null) {
+			helpAboutAction = new HelpAboutAction(application);
+		}
+		return helpAboutAction;
+	}
+
 }

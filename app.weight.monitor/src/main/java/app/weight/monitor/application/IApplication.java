@@ -40,4 +40,19 @@ public interface IApplication {
 	 */
 	void copyStateChange();
 
+	/**
+	 * Leave the application.
+	 */
+	void exitAction();
+
+	/**
+	 * Show the preferences dialog.
+	 */
+	void preferencesAction();
+
+	/**
+	 * Display information about this application.
+	 */
+	void helpAboutAction();
+
 }
