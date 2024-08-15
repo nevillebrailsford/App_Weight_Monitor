@@ -1,6 +1,8 @@
 package app.weight.monitor.application.chart;
 
-import javax.swing.table.TableModel;
+import java.awt.BorderLayout;
+
+import javax.swing.ToolTipManager;
 
 import application.base.app.gui.ColoredPanel;
 import application.charting.ChartComponent;
@@ -14,17 +16,13 @@ public class WeightGraph extends ColoredPanel {
 	/**
 	 * Create the drawing panel.
 	 * 
-	 * @param cp - a chart component.
-	 * @param tm - a table model.
+	 * @param chartComponent - a chart component.
 	 */
-	public WeightGraph(ChartComponent cp, TableModel tm) {
+	public WeightGraph(ChartComponent chartComponent) {
 		super();
+		setLayout(new BorderLayout());
+		add(chartComponent, BorderLayout.CENTER);
+		ToolTipManager.sharedInstance().registerComponent(chartComponent);
 	}
 
-	/**
-	 * Create the drawing panel.
-	 */
-	public WeightGraph() {
-		super();
-	}
 }

@@ -54,7 +54,7 @@ public class ReadingsManager extends AbstractTableModel implements ListModel<Str
 		if (instance == null) {
 			instance = new ReadingsManager();
 		}
-		LOGGER.exiting(CLASS_NAME, "isnatnce", instance);
+		LOGGER.exiting(CLASS_NAME, "instance", instance);
 		return instance;
 	}
 
@@ -143,12 +143,12 @@ public class ReadingsManager extends AbstractTableModel implements ListModel<Str
 	 * @param readings - a list of readings
 	 */
 	public void initialise(List<Reading> readings) {
-		LOGGER.entering(CLASS_NAME, "");
+		LOGGER.entering(CLASS_NAME, "initialise");
 		synchronized (this.readings) {
 			this.readings.addAll(readings);
 			Collections.sort(this.readings);
 		}
-		LOGGER.exiting(CLASS_NAME, "");
+		LOGGER.exiting(CLASS_NAME, "initialise");
 	}
 
 	/**
@@ -196,8 +196,8 @@ public class ReadingsManager extends AbstractTableModel implements ListModel<Str
 	 * @return - the file used to store the readings.
 	 */
 	public File dataFile() {
-		LOGGER.entering(CLASS_NAME, "");
-		LOGGER.exiting(CLASS_NAME, "");
+		LOGGER.entering(CLASS_NAME, "dataFile");
+		LOGGER.exiting(CLASS_NAME, "dataFile");
 		return dataFile;
 	}
 
@@ -216,7 +216,7 @@ public class ReadingsManager extends AbstractTableModel implements ListModel<Str
 	}
 
 	private File obtainModelDirectory() {
-		LOGGER.entering(CLASS_NAME, "");
+		LOGGER.entering(CLASS_NAME, "obtainModelDirectory");
 		File rootDirectory = ApplicationConfiguration.rootDirectory();
 		File applicationDirectory = new File(rootDirectory,
 				ApplicationConfiguration.applicationDefinition().applicationName());
@@ -232,7 +232,7 @@ public class ReadingsManager extends AbstractTableModel implements ListModel<Str
 		} else {
 			LOGGER.fine("Model directory " + modelDirectory.getAbsolutePath() + " does exist");
 		}
-		LOGGER.exiting(CLASS_NAME, "", modelDirectory);
+		LOGGER.exiting(CLASS_NAME, "obtainModelDirectory", modelDirectory);
 		return modelDirectory;
 	}
 

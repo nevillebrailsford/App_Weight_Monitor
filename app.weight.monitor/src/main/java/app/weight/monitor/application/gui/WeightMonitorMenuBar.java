@@ -15,7 +15,7 @@ import application.definition.ApplicationConfiguration;
  */
 public class WeightMonitorMenuBar extends JMenuBar {
 	private static final long serialVersionUID = 1L;
-	private static final String CLASS_NAME = EditorPanel.class.getName();
+	private static final String CLASS_NAME = WeightMonitorMenuBar.class.getName();
 	private static final Logger LOGGER = ApplicationConfiguration.logger();
 
 	private JMenu fileMenu = new JMenu("File");
