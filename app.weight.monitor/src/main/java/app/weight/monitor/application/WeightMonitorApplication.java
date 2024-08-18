@@ -15,6 +15,7 @@ import app.weight.monitor.application.chart.LineChartComponent;
 import app.weight.monitor.application.chart.LineChartPainter;
 import app.weight.monitor.application.chart.WeightGraph;
 import app.weight.monitor.application.gui.EditorPanel;
+import app.weight.monitor.application.gui.InformationPanel;
 import app.weight.monitor.application.gui.WeightMonitorMenuBar;
 import app.weight.monitor.storage.ReadingsLoad;
 import app.weight.monitor.storage.ReadingsManager;
@@ -43,6 +44,7 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 
 	JTabbedPane weightTabbedPane = new JTabbedPane();
 	EditorPanel editorPanel = null;
+	InformationPanel informationPanel = null;
 	WeightGraph plotPanel = null;
 
 	@Override
@@ -67,6 +69,7 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 		this.parent.setJMenuBar(new WeightMonitorMenuBar(this));
 		this.parent.setLayout(new GridBagLayout());
 		editorPanel = new EditorPanel(this);
+		informationPanel = new InformationPanel();
 		configureComponents();
 		layoutComponents();
 		loadData();
@@ -111,6 +114,7 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 		LOGGER.entering(CLASS_NAME, "configureComponents");
 		weightTabbedPane.setPreferredSize(new Dimension(500, 400));
 		weightTabbedPane.addTab("Weight Editor", editorPanel);
+		weightTabbedPane.addTab("Information", informationPanel);
 		LOGGER.exiting(CLASS_NAME, "configureComponents");
 	}
 

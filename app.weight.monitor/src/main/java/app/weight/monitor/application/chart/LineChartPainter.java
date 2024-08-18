@@ -111,7 +111,7 @@ public class LineChartPainter extends ChartPainter {
 		intervals = (int) ((maxValue - minValue) / gridSpacing);
 
 		// draw plot
-		g2D.setStroke(new BasicStroke(1));
+		g2D.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER));
 		for (int i = 1; i < lSize; i++) {
 			Line2D.Double weightLine = new Line2D.Double(dToX(date[i - 1], date[lSize - 1]),
 					wToY(value[i - 1], minValue, maxValue), dToX(date[i], date[lSize - 1]),
@@ -120,7 +120,7 @@ public class LineChartPainter extends ChartPainter {
 		}
 
 		// Draw uy labels and grid lines
-		Font labelFont = new Font("Arial", Font.BOLD, 10);
+		Font labelFont = new Font("Arial", Font.BOLD, 14);
 		g2D.setFont(labelFont);
 		Rectangle2D labelRect;
 		String lblText;
@@ -160,14 +160,15 @@ public class LineChartPainter extends ChartPainter {
 		wo = (sumD2 * sumW - sumD * sumDW) / (lSize * sumD2 - sumD * sumD);
 		Line2D.Double trendLine = new Line2D.Double(plotFrame.getX(), wToY(wo, minValue, maxValue),
 				dToX(date[lSize - 1], date[lSize - 1]), wToY(t * date[lSize - 1] + wo, minValue, maxValue));
+		g2D.setStroke(new BasicStroke(1));
 		g2D.setPaint(ColorProvider.get("palevioletred"));
 		g2D.draw(trendLine);
 		String title = "Trend: ";
 		if (t > 0)
 			title += "+";
 		t = (lSize * tSumDW - sumD * tSumW) / (lSize * sumD2 - sumD * sumD);
-		title += new DecimalFormat("0.00").format(7 * t) + " £/week";
-		Font titleFont = new Font("Arial", Font.BOLD, 10);
+		title += new DecimalFormat("0.00").format(7 * t) + " kg/week";
+		Font titleFont = new Font("Arial", Font.BOLD, 16);
 		Rectangle2D titleRect = titleFont.getStringBounds(title, g2D.getFontRenderContext());
 		g2D.setFont(titleFont);
 		g2D.setPaint(Color.black);

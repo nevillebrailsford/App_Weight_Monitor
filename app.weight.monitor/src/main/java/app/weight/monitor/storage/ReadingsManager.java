@@ -15,6 +15,7 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.table.AbstractTableModel;
 
+import app.weight.monitor.InformationModel;
 import app.weight.monitor.model.Reading;
 import application.definition.ApplicationConfiguration;
 import application.storage.Storage;
@@ -23,7 +24,7 @@ import application.storage.Storage;
  * ReadingManager provides the interface to the backing storage for the weight
  * monitor application.
  */
-public class ReadingsManager extends AbstractTableModel implements ListModel<String> {
+public class ReadingsManager extends AbstractTableModel implements ListModel<String>, InformationModel {
 	private static final long serialVersionUID = 1L;
 	private static final String CLASS_NAME = ReadingsManager.class.getName();
 	private static final Logger LOGGER = ApplicationConfiguration.logger();
@@ -295,6 +296,81 @@ public class ReadingsManager extends AbstractTableModel implements ListModel<Str
 		}
 		LOGGER.exiting(CLASS_NAME, "getValueAt", result);
 		return result;
+	}
+
+	// InformationModel implementation
+
+	@Override
+	public int numberOfReadings() {
+		return readings.size();
+	}
+
+	@Override
+	public int numberOfWeeks() {
+		long first = LocalDate.parse(earliestDate(), dateFormatter).toEpochDay();
+		long last = LocalDate.parse(latestDate(), dateFormatter).toEpochDay();
+		int days = (int) (last - first);
+		return days / 7;
+	}
+
+	@Override
+	public String earliestDate() {
+		Reading reading = readings.get(0);
+		return reading.date().format(dateFormatter);
+	}
+
+	@Override
+	public String latestDate() {
+		Reading reading = readings.get(readings.size() - 1);
+		return reading.date().format(dateFormatter);
+	}
+
+	@Override
+	public String earliestWeight() {
+		Reading reading = readings.get(0);
+		double weight = Double.parseDouble(reading.weight());
+		return String.format("%.2f", weight);
+	}
+
+	@Override
+	public String latestWeight() {
+		Reading reading = readings.get(readings.size() - 1);
+		double weight = Double.parseDouble(reading.weight());
+		return String.format("%.2f", weight);
+	}
+
+	@Override
+	public String changeInWeight() {
+		double firstWeight = Double.parseDouble(earliestWeight());
+		double lastWeight = Double.parseDouble(latestWeight());
+		return String.format("%.2f", firstWeight - lastWeight);
+	}
+
+	@Override
+	public String lightestWeight() {
+		double min = readings.stream().map((r) -> Double.parseDouble(r.weight())).min(Double::compare).get();
+		return String.format("%.2f", min);
+	}
+
+	@Override
+	public String heaviestWeight() {
+		double max = readings.stream().map((r) -> Double.parseDouble(r.weight())).max(Double::compare).get();
+		return String.format("%.2f", max);
+	}
+
+	@Override
+	public String averageWeight() {
+		double sum = readings.stream().mapToDouble((r) -> Double.parseDouble(r.weight())).sum();
+		double avg = sum / numberOfReadings();
+		return String.format("%.2f", avg);
+	}
+
+	@Override
+	public String averageChangePerWeek() {
+		double changeInWeight = Double.parseDouble(changeInWeight());
+		int numberOfWeeks = numberOfWeeks();
+		double avg = changeInWeight / numberOfWeeks;
+		return String.format("%.2f", avg);
 	}
 
 }
