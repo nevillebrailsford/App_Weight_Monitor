@@ -29,6 +29,7 @@ public class InformationPanel extends ColoredPanel {
 	private JTextField averageChangePerWeek = new JTextField();
 
 	private int yRow = 0;
+	private int topGap = 35;
 
 	public InformationPanel() {
 		GridBagLayout gridBagLayout = new GridBagLayout();
@@ -46,6 +47,7 @@ public class InformationPanel extends ColoredPanel {
 	private void buildGUI() {
 		buildLabel("Number of Readings:");
 		buildTextField(numberOfReadings);
+		topGap = 5;
 
 		buildLabel("Number of Weeks:");
 		buildTextField(numberOfWeeks);
@@ -85,7 +87,7 @@ public class InformationPanel extends ColoredPanel {
 		textField.setColumns(10);
 		GridBagConstraints gbc_textField = new GridBagConstraints();
 		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField.insets = new Insets(0, 30, 5, 150);
+		gbc_textField.insets = new Insets(topGap, 30, 5, 120);
 		gbc_textField.gridx = 1;
 		gbc_textField.gridy = yRow - 1;
 		add(textField, gbc_textField);
@@ -95,7 +97,7 @@ public class InformationPanel extends ColoredPanel {
 		JLabel lblNewLabel = new JLabel(title);
 		lblNewLabel.setFont(new Font("Arial", Font.BOLD, 14));
 		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
-		gbc_lblNewLabel.insets = new Insets(5, 5, 5, 5);
+		gbc_lblNewLabel.insets = new Insets(topGap, 60, 5, 5);
 		gbc_lblNewLabel.anchor = GridBagConstraints.EAST;
 		gbc_lblNewLabel.gridx = 0;
 		gbc_lblNewLabel.gridy = yRow++;

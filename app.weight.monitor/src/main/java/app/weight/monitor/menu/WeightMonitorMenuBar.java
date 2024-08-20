@@ -1,4 +1,4 @@
-package app.weight.monitor.application.gui;
+package app.weight.monitor.menu;
 
 import java.util.logging.Logger;
 

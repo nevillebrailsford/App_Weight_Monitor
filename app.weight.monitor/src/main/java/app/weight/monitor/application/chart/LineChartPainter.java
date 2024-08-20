@@ -15,6 +15,7 @@ import java.util.Date;
 import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
 
+import app.weight.monitor.application.WeightMonitorApplication;
 import application.base.app.gui.ColorProvider;
 import application.charting.ChartPainter;
 
@@ -68,12 +69,12 @@ public class LineChartPainter extends ChartPainter {
 		tSumDW = 0.0;
 		sumDW = 0.0;
 		Graphics2D g2D = (Graphics2D) g;
-		g2D.setPaint(ColorProvider.get("floralwhite"));
+		g2D.setPaint(ColorProvider.get(WeightMonitorApplication.colorChoice.background()));
 		g2D.fill(plotFrame);
 		g2D.setStroke(new BasicStroke(2));
 		g2D.setPaint(Color.black);
 		g2D.draw(plotFrame);
-		g2D.setPaint(ColorProvider.get("cornflowerblue"));
+		g2D.setPaint(ColorProvider.get(WeightMonitorApplication.colorChoice.chartLine()));
 		long t1 = stringToDate(labels[0]).getTime();
 		for (int i = 0; i < lSize; i++) {
 			s = labels[i];
@@ -161,7 +162,7 @@ public class LineChartPainter extends ChartPainter {
 		Line2D.Double trendLine = new Line2D.Double(plotFrame.getX(), wToY(wo, minValue, maxValue),
 				dToX(date[lSize - 1], date[lSize - 1]), wToY(t * date[lSize - 1] + wo, minValue, maxValue));
 		g2D.setStroke(new BasicStroke(1));
-		g2D.setPaint(ColorProvider.get("palevioletred"));
+		g2D.setPaint(ColorProvider.get(WeightMonitorApplication.colorChoice.trendLine()));
 		g2D.draw(trendLine);
 		String title = "Trend: ";
 		if (t > 0)

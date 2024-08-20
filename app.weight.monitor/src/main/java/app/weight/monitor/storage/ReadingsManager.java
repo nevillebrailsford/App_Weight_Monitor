@@ -29,6 +29,7 @@ public class ReadingsManager extends AbstractTableModel implements ListModel<Str
 	private static final String CLASS_NAME = ReadingsManager.class.getName();
 	private static final Logger LOGGER = ApplicationConfiguration.logger();
 	private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+	private static final DateTimeFormatter infoDateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
 	private static ReadingsManager instance = null;
 	private static String[] COLUMNS = { "Date", "Weight" };

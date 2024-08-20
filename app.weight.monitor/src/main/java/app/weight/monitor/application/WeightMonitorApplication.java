@@ -13,18 +13,21 @@ import app.weight.monitor.Constants;
 import app.weight.monitor.actions.ActionFactory;
 import app.weight.monitor.application.chart.LineChartComponent;
 import app.weight.monitor.application.chart.LineChartPainter;
-import app.weight.monitor.application.chart.WeightGraph;
 import app.weight.monitor.application.gui.EditorPanel;
+import app.weight.monitor.application.gui.GUIConstants;
 import app.weight.monitor.application.gui.InformationPanel;
-import app.weight.monitor.application.gui.WeightMonitorMenuBar;
+import app.weight.monitor.application.gui.WeightPanel;
+import app.weight.monitor.menu.WeightMonitorMenuBar;
+import app.weight.monitor.preferences.ColorChoice;
+import app.weight.monitor.preferences.WeightMonitorPreferencesDialog;
 import app.weight.monitor.storage.ReadingsLoad;
 import app.weight.monitor.storage.ReadingsManager;
 import application.base.app.ApplicationBaseForGUI;
 import application.base.app.Parameters;
-import application.base.app.gui.PreferencesDialog;
 import application.change.ChangeManager;
 import application.definition.ApplicationConfiguration;
 import application.definition.ApplicationDefinition;
+import application.inifile.IniFile;
 import application.replicate.CopyAndPaste;
 import application.storage.StoreDetails;
 
@@ -35,6 +38,7 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 
 	private static final long serialVersionUID = 1L;
 	private static final String CLASS_NAME = WeightMonitorApplication.class.getName();
+	public static ColorChoice colorChoice = null;
 
 	private static Logger LOGGER = null;
 
@@ -45,7 +49,7 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 	JTabbedPane weightTabbedPane = new JTabbedPane();
 	EditorPanel editorPanel = null;
 	InformationPanel informationPanel = null;
-	WeightGraph plotPanel = null;
+	WeightPanel plotPanel = null;
 
 	@Override
 	public void configureStoreDetails() {
@@ -70,6 +74,7 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 		this.parent.setLayout(new GridBagLayout());
 		editorPanel = new EditorPanel(this);
 		informationPanel = new InformationPanel();
+		processPreferences();
 		configureComponents();
 		layoutComponents();
 		loadData();
@@ -77,12 +82,11 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 		new WeightMonitorCopyListener(this);
 		LineChartPainter chartPainter = new LineChartPainter();
 		LineChartComponent chartComponent = new LineChartComponent(ReadingsManager.instance(), chartPainter);
-		plotPanel = new WeightGraph(chartComponent);
+		plotPanel = new WeightPanel(chartComponent);
 		weightTabbedPane.addTab("Weight Plot", plotPanel);
 		pack();
 		editorPanel.requestFocus();
 		LOGGER.exiting(CLASS_NAME, "start");
-
 	}
 
 	@Override
@@ -171,6 +175,22 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 		return result;
 	}
 
+	private static void processPreferences() {
+		String background = IniFile.value(GUIConstants.BACKGROUND_COLOR);
+		String chartLine = IniFile.value(GUIConstants.CHART_LINE_COLOR);
+		String trendLine = IniFile.value(GUIConstants.TREND_LINE_COLOR);
+		if (background == null || background.isEmpty() || background.equals("default")) {
+			background = GUIConstants.DEFAULT_BACKGROUND_COLOR;
+		}
+		if (chartLine == null || chartLine.isEmpty() || chartLine.equals("default")) {
+			chartLine = GUIConstants.DEFAULT_CHART_LINE_COLOR;
+		}
+		if (trendLine == null || trendLine.isEmpty() || trendLine.equals("default")) {
+			trendLine = GUIConstants.DEFAULT_TREND_LINE_COLOR;
+		}
+		colorChoice = new ColorChoice(background, chartLine, trendLine);
+	}
+
 	// IApplication implementation
 
 	@Override
@@ -215,7 +235,7 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 
 	@Override
 	public void preferencesAction() {
-		PreferencesDialog dialog = new PreferencesDialog(parent);
+		WeightMonitorPreferencesDialog dialog = new WeightMonitorPreferencesDialog(parent);
 		dialog.setVisible(true);
 		dialog.dispose();
 

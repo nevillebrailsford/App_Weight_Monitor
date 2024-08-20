@@ -1,4 +1,4 @@
-package app.weight.monitor.application.chart;
+package app.weight.monitor.application.gui;
 
 import java.awt.BorderLayout;
 
@@ -10,7 +10,7 @@ import application.charting.ChartComponent;
 /**
  * This class draws the graph showing my weight history.
  */
-public class WeightGraph extends ColoredPanel {
+public class WeightPanel extends ColoredPanel {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -18,7 +18,7 @@ public class WeightGraph extends ColoredPanel {
 	 * 
 	 * @param chartComponent - a chart component.
 	 */
-	public WeightGraph(ChartComponent chartComponent) {
+	public WeightPanel(ChartComponent chartComponent) {
 		super();
 		setLayout(new BorderLayout());
 		add(chartComponent, BorderLayout.CENTER);
