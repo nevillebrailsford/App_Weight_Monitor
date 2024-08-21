@@ -30,6 +30,18 @@ public class LineChartPainter extends ChartPainter {
 	private double[] date;
 	private double[] value;
 
+	double minValue, maxValue;
+	String s;
+	int intervals;
+	double gridSpacing, wLegend;
+	double sumD, sumD2, sumW, sumDW;
+	double tSumW, tSumDW;
+	double t, wo;
+	long t1, t2;
+	Font labelFont;
+	Rectangle2D labelRect;
+	String lblText;
+
 	@Override
 	public int indexOfEntryAt(MouseEvent me) {
 		int x = me.getX();
@@ -47,19 +59,31 @@ public class LineChartPainter extends ChartPainter {
 	@Override
 	public void paint(Graphics g, JComponent c) {
 		lSize = values.length;
-		date = new double[lSize];
-		value = new double[lSize];
-		double minValue, maxValue;
-		String s;
-		int intervals;
-		double gridSpacing, wLegend;
-		double sumD, sumD2, sumW, sumDW;
-		double tSumW, tSumDW;
-		double t, wo;
 		if (lSize < 2) {
 			return;
 		}
-		plotFrame = new Rectangle2D.Double(50, 40, 420, 280);
+		Graphics2D g2D = (Graphics2D) g;
+		drawGraph(g2D);
+		g2D.dispose();
+	}
+
+	private void drawGraph(Graphics2D g2D) {
+		initializeValues();
+		drawFrame(g2D);
+		calculateMinAndMaxPoints();
+		adjustMinAndMax();
+		calculateSpacing();
+		calculateIntervals();
+		drawPlotLine(g2D);
+		drawYLabelsAndGridLines(g2D);
+		drawBottomInfo(g2D);
+		drawTrendLine(g2D);
+		drawTitle(g2D);
+	}
+
+	private void initializeValues() {
+		date = new double[lSize];
+		value = new double[lSize];
 		minValue = 1000000.0;
 		maxValue = 0.0;
 		sumD = 0.0;
@@ -68,17 +92,23 @@ public class LineChartPainter extends ChartPainter {
 		tSumW = 0.0;
 		tSumDW = 0.0;
 		sumDW = 0.0;
-		Graphics2D g2D = (Graphics2D) g;
+		labelFont = new Font("Arial", Font.BOLD, 14);
+	}
+
+	private void drawFrame(Graphics2D g2D) {
+		plotFrame = new Rectangle2D.Double(50, 40, 420, 280);
 		g2D.setPaint(ColorProvider.get(WeightMonitorApplication.colorChoice.background()));
 		g2D.fill(plotFrame);
 		g2D.setStroke(new BasicStroke(2));
 		g2D.setPaint(Color.black);
 		g2D.draw(plotFrame);
-		g2D.setPaint(ColorProvider.get(WeightMonitorApplication.colorChoice.chartLine()));
-		long t1 = stringToDate(labels[0]).getTime();
+	}
+
+	private void calculateMinAndMaxPoints() {
+		t1 = stringToDate(labels[0]).getTime();
 		for (int i = 0; i < lSize; i++) {
 			s = labels[i];
-			long t2 = stringToDate(s).getTime();
+			t2 = stringToDate(s).getTime();
 			date[i] = (double) ((t2 - t1) / (24 * 3600 * 1000));
 			value[i] = values[i];
 			minValue = Math.min(value[i], minValue);
@@ -90,11 +120,17 @@ public class LineChartPainter extends ChartPainter {
 			tSumW += values[i];
 			tSumDW += date[i] * values[i];
 		}
+	}
+
+	private void adjustMinAndMax() {
 		if (minValue == maxValue) {
 			minValue = maxValue - 1;
 		}
 		maxValue = (double) ((int) maxValue + 0.5);
 		minValue = (double) ((int) minValue - 0.5);
+	}
+
+	private void calculateSpacing() {
 		if (maxValue - minValue <= 5.0)
 			gridSpacing = 1.0;
 		else if (maxValue - minValue <= 10.0)
@@ -105,13 +141,19 @@ public class LineChartPainter extends ChartPainter {
 			gridSpacing = 10.0;
 		else
 			gridSpacing = 20.0;
+	}
+
+	private void calculateIntervals() {
 		if (maxValue % (int) gridSpacing != 0)
 			maxValue = gridSpacing * (int) (maxValue / gridSpacing) + gridSpacing;
 		if (minValue % (int) gridSpacing != 0)
 			minValue = gridSpacing * (int) (minValue / gridSpacing);
 		intervals = (int) ((maxValue - minValue) / gridSpacing);
+	}
 
+	private void drawPlotLine(Graphics2D g2D) {
 		// draw plot
+		g2D.setPaint(ColorProvider.get(WeightMonitorApplication.colorChoice.chartLine()));
 		g2D.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER));
 		for (int i = 1; i < lSize; i++) {
 			Line2D.Double weightLine = new Line2D.Double(dToX(date[i - 1], date[lSize - 1]),
@@ -119,12 +161,11 @@ public class LineChartPainter extends ChartPainter {
 					wToY(value[i], minValue, maxValue));
 			g2D.draw(weightLine);
 		}
+	}
 
-		// Draw uy labels and grid lines
-		Font labelFont = new Font("Arial", Font.BOLD, 14);
+	private void drawYLabelsAndGridLines(Graphics2D g2D) {
+		// Draw y labels and grid lines
 		g2D.setFont(labelFont);
-		Rectangle2D labelRect;
-		String lblText;
 		g2D.setStroke(new BasicStroke(1));
 		g2D.setPaint(Color.black);
 		wLegend = minValue;
@@ -140,8 +181,11 @@ public class LineChartPainter extends ChartPainter {
 			}
 			wLegend += gridSpacing;
 		}
+	}
 
+	private void drawBottomInfo(Graphics2D g2D) {
 		// Draw bottom into
+		g2D.setPaint(Color.black);
 		String dateText = "Start: " + labels[0];
 		g2D.drawString(dateText, (int) (plotFrame.getX() + 10), (int) (plotFrame.getY() + plotFrame.getHeight() + 20));
 		Line2D.Double dateLine = new Line2D.Double(plotFrame.getX() + 10, plotFrame.getY() + plotFrame.getHeight() + 10,
@@ -155,7 +199,9 @@ public class LineChartPainter extends ChartPainter {
 				plotFrame.getY() + plotFrame.getHeight() + 10, plotFrame.getX() + plotFrame.getWidth(),
 				plotFrame.getY() + plotFrame.getHeight());
 		g2D.draw(dateLine);
+	}
 
+	private void drawTrendLine(Graphics2D g2D) {
 		// draw trend line and title
 		t = (lSize * sumDW - sumD * sumW) / (lSize * sumD2 - sumD * sumD);
 		wo = (sumD2 * sumW - sumD * sumDW) / (lSize * sumD2 - sumD * sumD);
@@ -164,6 +210,9 @@ public class LineChartPainter extends ChartPainter {
 		g2D.setStroke(new BasicStroke(1));
 		g2D.setPaint(ColorProvider.get(WeightMonitorApplication.colorChoice.trendLine()));
 		g2D.draw(trendLine);
+	}
+
+	private void drawTitle(Graphics2D g2D) {
 		String title = "Trend: ";
 		if (t > 0)
 			title += "+";
@@ -175,8 +224,6 @@ public class LineChartPainter extends ChartPainter {
 		g2D.setPaint(Color.black);
 		g2D.drawString(title, (int) (plotFrame.getX() + 0.5 * (plotFrame.getWidth() - titleRect.getWidth())),
 				(int) (plotFrame.getY() - 10));
-		g2D.dispose();
-
 	}
 
 	public static ComponentUI createUI(JComponent c) {
