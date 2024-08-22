@@ -248,7 +248,7 @@ public class ReadingsManager extends AbstractTableModel implements ListModel<Str
 	@Override
 	public String getElementAt(int index) {
 		Reading reading = readings.get(index);
-		return reading.date().format(dateFormatter) + "       " + reading.weight();
+		return reading.date().format(infoDateFormatter) + "       " + reading.weight();
 	}
 
 	@Override
@@ -308,8 +308,8 @@ public class ReadingsManager extends AbstractTableModel implements ListModel<Str
 
 	@Override
 	public int numberOfWeeks() {
-		long first = LocalDate.parse(earliestDate(), dateFormatter).toEpochDay();
-		long last = LocalDate.parse(latestDate(), dateFormatter).toEpochDay();
+		long first = LocalDate.parse(earliestDate(), infoDateFormatter).toEpochDay();
+		long last = LocalDate.parse(latestDate(), infoDateFormatter).toEpochDay();
 		int days = (int) (last - first);
 		return days / 7;
 	}
@@ -317,13 +317,13 @@ public class ReadingsManager extends AbstractTableModel implements ListModel<Str
 	@Override
 	public String earliestDate() {
 		Reading reading = readings.get(0);
-		return reading.date().format(dateFormatter);
+		return reading.date().format(infoDateFormatter);
 	}
 
 	@Override
 	public String latestDate() {
 		Reading reading = readings.get(readings.size() - 1);
-		return reading.date().format(dateFormatter);
+		return reading.date().format(infoDateFormatter);
 	}
 
 	@Override

@@ -277,6 +277,7 @@ public class EditorPanel extends ColoredPanel implements ListDataListener {
 			if (event.getNewValue() instanceof Calendar) {
 				Calendar cal = (Calendar) event.getNewValue();
 				selectedDate = LocalDate.ofInstant(cal.toInstant(), ZoneId.systemDefault());
+				scrollToSelectedDate();
 			}
 		}
 		addButton.setEnabled(validateWeight());
@@ -364,6 +365,24 @@ public class EditorPanel extends ColoredPanel implements ListDataListener {
 		fileTextArea.setText(ReadingsManager.instance().dataFile().getAbsolutePath());
 		weightsList.ensureIndexIsVisible(ReadingsManager.instance().readings().size() - 1);
 		LOGGER.exiting(CLASS_NAME, "initializeData");
+	}
+
+	private void scrollToSelectedDate() {
+		LOGGER.entering(CLASS_NAME, "scrollToSelectedDate");
+		int selection = -1;
+		for (int i = 0; i < ReadingsManager.instance().numberOfReadings(); i++) {
+			Reading reading = ReadingsManager.instance().reading(i);
+			if (reading.date().isAfter(selectedDate) || reading.date().equals(selectedDate)) {
+				selection = i;
+				break;
+			}
+		}
+		if (selection == -1) {
+			selection = ReadingsManager.instance().numberOfReadings() - 1;
+		}
+		weightsList.ensureIndexIsVisible(selection);
+		weightsList.setSelectedIndex(selection);
+		LOGGER.exiting(CLASS_NAME, "scrollToSelectedDate");
 	}
 
 	// ListDataListener implementation

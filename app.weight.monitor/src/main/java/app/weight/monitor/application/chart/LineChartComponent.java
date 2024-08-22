@@ -28,8 +28,10 @@ public class LineChartComponent extends ChartComponent {
 	 * Create and store the tool tips.
 	 */
 	protected void createLabelsAndTips() {
+		LineChartPainter lcp = (LineChartPainter) cp;
 		for (int i = model.getRowCount() - 1; i >= 0; i--) {
-			tips[i] = String.valueOf(model.getValueAt(i, 1) + " on " + model.getValueAt(i, 0));
+			tips[i] = String
+					.valueOf(model.getValueAt(i, 1) + " on " + lcp.convertToUKFormat((String) model.getValueAt(i, 0)));
 		}
 	}
 

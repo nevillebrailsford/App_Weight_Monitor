@@ -9,6 +9,8 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -186,12 +188,12 @@ public class LineChartPainter extends ChartPainter {
 	private void drawBottomInfo(Graphics2D g2D) {
 		// Draw bottom into
 		g2D.setPaint(Color.black);
-		String dateText = "Start: " + labels[0];
+		String dateText = "Start: " + convertToUKFormat(labels[0]);
 		g2D.drawString(dateText, (int) (plotFrame.getX() + 10), (int) (plotFrame.getY() + plotFrame.getHeight() + 20));
 		Line2D.Double dateLine = new Line2D.Double(plotFrame.getX() + 10, plotFrame.getY() + plotFrame.getHeight() + 10,
 				plotFrame.getX(), plotFrame.getY() + plotFrame.getHeight());
 		g2D.draw(dateLine);
-		dateText = "End: " + labels[labels.length - 1];
+		dateText = "End: " + convertToUKFormat(labels[labels.length - 1]);
 		Rectangle2D dateRect = labelFont.getStringBounds(dateText, g2D.getFontRenderContext());
 		g2D.drawString(dateText, (int) (plotFrame.getX() + plotFrame.getWidth() - dateRect.getWidth() - 10),
 				(int) (plotFrame.getY() + plotFrame.getHeight() + 20));
@@ -253,4 +255,16 @@ public class LineChartPainter extends ChartPainter {
 		return dmax * (x - plotFrame.getX()) / (plotFrame.getWidth() - 1);
 	}
 
+	/**
+	 * Convert date to UK format
+	 * 
+	 * @param date - in US format
+	 * @return date in UK format
+	 */
+	public String convertToUKFormat(String date) {
+		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+		DateTimeFormatter infoDateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		LocalDate localDate = LocalDate.parse(date, dateFormatter);
+		return localDate.format(infoDateFormatter);
+	}
 }
