@@ -15,6 +15,7 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.table.AbstractTableModel;
 
+import app.weight.monitor.BarChartModel;
 import app.weight.monitor.InformationModel;
 import app.weight.monitor.model.Reading;
 import application.definition.ApplicationConfiguration;
@@ -24,7 +25,10 @@ import application.storage.Storage;
  * ReadingManager provides the interface to the backing storage for the weight
  * monitor application.
  */
-public class ReadingsManager extends AbstractTableModel implements ListModel<String>, InformationModel {
+/**
+ * 
+ */
+public class ReadingsManager extends AbstractTableModel implements ListModel<String>, InformationModel, BarChartModel {
 	private static final long serialVersionUID = 1L;
 	private static final String CLASS_NAME = ReadingsManager.class.getName();
 	private static final Logger LOGGER = ApplicationConfiguration.logger();
@@ -372,6 +376,29 @@ public class ReadingsManager extends AbstractTableModel implements ListModel<Str
 		int numberOfWeeks = numberOfWeeks();
 		double avg = changeInWeight / numberOfWeeks;
 		return String.format("%.2f", avg);
+	}
+
+	// BarChartModel implementation
+
+	@Override
+	public int numberOfColumns() {
+		double lWeight = Double.parseDouble(lightestWeight());
+		double hWeight = Double.parseDouble(heaviestWeight());
+		double diffWeight = Math.ceil(hWeight) - Math.floor(lWeight);
+		int numberOfColumns = (int) diffWeight * 2;
+		return numberOfColumns;
+	}
+
+	@Override
+	public double valueAtColumn(int columnNumber) {
+		double value = Double.parseDouble(lightestWeight()) + (columnNumber * 0.5);
+		return value;
+	}
+
+	@Override
+	public int numberForValue(double value) {
+		int count = (int) readings.stream().filter((r) -> r.weight().equals(Double.toString(value))).count();
+		return count;
 	}
 
 }

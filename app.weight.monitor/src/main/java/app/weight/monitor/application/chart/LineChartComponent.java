@@ -18,7 +18,7 @@ public class LineChartComponent extends ChartComponent {
 	 * Create the component.
 	 * 
 	 * @param tableModel   - the model that supplies the data.
-	 * @param chartPainter - the painter that psints the screen.
+	 * @param chartPainter - the painter that prints the screen.
 	 */
 	public LineChartComponent(TableModel tableModel, ChartPainter chartPainter) {
 		super(tableModel, chartPainter);

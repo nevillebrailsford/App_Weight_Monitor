@@ -11,12 +11,14 @@ import javax.swing.JTabbedPane;
 
 import app.weight.monitor.Constants;
 import app.weight.monitor.actions.ActionFactory;
+import app.weight.monitor.application.chart.BarChartComponent;
+import app.weight.monitor.application.chart.BarChartPainter;
 import app.weight.monitor.application.chart.LineChartComponent;
 import app.weight.monitor.application.chart.LineChartPainter;
+import app.weight.monitor.application.gui.ChartPanel;
 import app.weight.monitor.application.gui.EditorPanel;
 import app.weight.monitor.application.gui.GUIConstants;
 import app.weight.monitor.application.gui.InformationPanel;
-import app.weight.monitor.application.gui.WeightPanel;
 import app.weight.monitor.menu.WeightMonitorMenuBar;
 import app.weight.monitor.preferences.ColorChoice;
 import app.weight.monitor.preferences.WeightMonitorPreferencesDialog;
@@ -49,7 +51,8 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 	JTabbedPane weightTabbedPane = new JTabbedPane();
 	EditorPanel editorPanel = null;
 	InformationPanel informationPanel = null;
-	WeightPanel plotPanel = null;
+	ChartPanel lineChartPanel = null;
+	ChartPanel barChartPanel = null;
 
 	@Override
 	public void configureStoreDetails() {
@@ -82,8 +85,12 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 		new WeightMonitorCopyListener(this);
 		LineChartPainter chartPainter = new LineChartPainter();
 		LineChartComponent chartComponent = new LineChartComponent(ReadingsManager.instance(), chartPainter);
-		plotPanel = new WeightPanel(chartComponent);
-		weightTabbedPane.addTab("Weight Plot", plotPanel);
+		lineChartPanel = new ChartPanel(chartComponent);
+		weightTabbedPane.addTab("Weight Plot", lineChartPanel);
+		BarChartPainter barChartPainter = new BarChartPainter();
+		BarChartComponent barChartComponent = new BarChartComponent(ReadingsManager.instance(), barChartPainter);
+		barChartPanel = new ChartPanel(barChartComponent);
+		weightTabbedPane.addTab("Weight Distribution", barChartPanel);
 		pack();
 		editorPanel.requestFocus();
 		LOGGER.exiting(CLASS_NAME, "start");

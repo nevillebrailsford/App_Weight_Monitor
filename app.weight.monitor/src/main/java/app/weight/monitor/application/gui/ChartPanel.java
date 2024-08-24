@@ -10,7 +10,7 @@ import application.charting.ChartComponent;
 /**
  * This class draws the graph showing my weight history.
  */
-public class WeightPanel extends ColoredPanel {
+public class ChartPanel extends ColoredPanel {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -18,7 +18,7 @@ public class WeightPanel extends ColoredPanel {
 	 * 
 	 * @param chartComponent - a chart component.
 	 */
-	public WeightPanel(ChartComponent chartComponent) {
+	public ChartPanel(ChartComponent chartComponent) {
 		super();
 		setLayout(new BorderLayout());
 		add(chartComponent, BorderLayout.CENTER);
