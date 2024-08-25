@@ -2,15 +2,18 @@ package app.weight.monitor.application.chart;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 
 import javax.swing.JComponent;
 
 import app.weight.monitor.BarChartModel;
 import app.weight.monitor.application.WeightMonitorApplication;
+import app.weight.monitor.storage.ReadingsManager;
 import application.base.app.gui.ColorProvider;
 import application.charting.ChartPainter;
 
@@ -19,12 +22,16 @@ public class BarChartPainter extends ChartPainter {
 	private Rectangle2D.Double plotFrame;
 	private int lSize;
 	private int[] count;
+	private Color[] color;
 	private double[] value;
 	private double columnWidth;
 
 	double minValue, maxValue;
-	double gridSpacing, wLegend;
-	int intervals;
+	double gridSpacing;
+	int intervals, wLegend;
+	Font labelFont;
+	Rectangle2D labelRect;
+	String lblText;
 
 	private BarChartModel model;
 
@@ -35,15 +42,12 @@ public class BarChartPainter extends ChartPainter {
 
 	@Override
 	public int indexOfEntryAt(MouseEvent me) {
-		System.out.println("indexOfEntryAt");
-		return 0;
+		return (int) Math.floor((me.getX() - plotFrame.getX()) / columnWidth);
 	}
 
 	@Override
 	public void paint(Graphics g, JComponent c) {
-		System.out.println("paint");
 		lSize = values.length;
-		System.out.println(lSize);
 		if (lSize < 2) {
 			return;
 		}
@@ -60,11 +64,11 @@ public class BarChartPainter extends ChartPainter {
 		adjustMinAndMax();
 		calculateSpacing();
 		calculateIntervals();
+		drawYLabelsAndGridLines(g2D);
 		drawBarChart(g2D);
-//		drawYLabelsAndGridLines(g2D);
 //		drawBottomInfo(g2D);
 //		drawTrendLine(g2D);
-//		drawTitle(g2D);
+		drawTitle(g2D);
 	}
 
 	private void drawFrame(Graphics2D g2D) {
@@ -78,19 +82,25 @@ public class BarChartPainter extends ChartPainter {
 
 	private void initializeValues() {
 		value = new double[lSize];
-		count = new int[lSize];
 		minValue = 1000000;
 		maxValue = 0;
-		for (int i = 0; i < lSize; i++) {
-			count[i] = model.numberForValue(model.valueAtColumn(i));
-		}
 		columnWidth = 420 / lSize;
-
+		if (count == null || count.length != lSize) {
+			count = new int[lSize];
+			for (int i = 0; i < lSize; i++) {
+				count[i] = model.numberForValue(model.valueAtColumn(i));
+			}
+		}
+		if (color == null || color.length != lSize) {
+			color = new Color[lSize];
+			for (int i = 0; i < lSize; i++) {
+				color[i] = ColorProvider.nextColor();
+			}
+		}
+		labelFont = new Font("Arial", Font.BOLD, 14);
 	}
 
 	private void calculateMinAndMaxPoints() {
-		printArray(values);
-		printArray(count);
 		for (int i = 0; i < lSize; i++) {
 			value[i] = values[i];
 			minValue = Math.min(count[i], minValue);
@@ -127,14 +137,89 @@ public class BarChartPainter extends ChartPainter {
 
 	private void drawBarChart(Graphics2D g2D) {
 		// draw bar chart
-		g2D.setPaint(ColorProvider.get(WeightMonitorApplication.colorChoice.chartLine()));
 		g2D.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER));
-
 		for (int i = 0; i < lSize; i++) {
 			Rectangle2D.Double bar = new Rectangle2D.Double(columnToX(i), countToY(count[i], minValue, maxValue),
 					columnWidth, countToH(count[i], minValue, maxValue));
+			g2D.setPaint(color[i]);
 			g2D.fill(bar);
+			g2D.setPaint(Color.black);
+			g2D.draw(bar);
 		}
+	}
+
+	private void drawYLabelsAndGridLines(Graphics2D g2D) {
+		// Draw y labels and grid lines
+		g2D.setFont(labelFont);
+		g2D.setStroke(new BasicStroke(1));
+		g2D.setPaint(Color.black);
+		wLegend = (int) minValue;
+		for (int i = 0; i <= intervals; i++) {
+			lblText = String.valueOf((int) wLegend);
+			labelRect = labelFont.getStringBounds(lblText, g2D.getFontRenderContext());
+			g2D.drawString(lblText, (int) (plotFrame.getX() - labelRect.getWidth() - 5),
+					(int) (countToY(wLegend, minValue, maxValue) + 0.5 * labelRect.getHeight()));
+			if (i > 0 && i < intervals) {
+				Line2D.Double gridLine = new Line2D.Double(plotFrame.getX(), countToY(wLegend, minValue, maxValue),
+						plotFrame.getX() + plotFrame.getWidth(), countToY(wLegend, minValue, maxValue));
+				g2D.draw(gridLine);
+			}
+			wLegend += gridSpacing;
+		}
+	}
+
+	private void drawTitle(Graphics2D g2D) {
+		double standardDeviation = standardDeviation();
+		String title = "Weight Distribution " + '\u03C3' + " " + String.format("%.5f", standardDeviation) + "kg";
+		Font titleFont = new Font("Arial", Font.BOLD, 16);
+		Rectangle2D titleRect = titleFont.getStringBounds(title, g2D.getFontRenderContext());
+		g2D.setFont(titleFont);
+		g2D.setPaint(Color.black);
+		g2D.drawString(title, (int) (plotFrame.getX() + 0.5 * (plotFrame.getWidth() - titleRect.getWidth())),
+				(int) (plotFrame.getY() - 10));
+	}
+
+	private double standardDeviation() {
+		double mean = mean();
+		double[] deviation = deviation(mean);
+		double[] deviationSquared = deviationSquared(deviation);
+		double sumOfDeviationSquared = sumOfDeviationSquared(deviationSquared);
+		double variance = variance(sumOfDeviationSquared);
+		double standardDeviation = Math.sqrt(variance);
+		return standardDeviation;
+	}
+
+	private double mean() {
+		return Double.parseDouble(ReadingsManager.instance().averageWeight());
+	}
+
+	private double[] deviation(double mean) {
+		int numberOfReadings = ReadingsManager.instance().numberOfReadings();
+		double[] deviations = new double[numberOfReadings];
+		for (int i = 0; i < numberOfReadings; i++) {
+			deviations[i] = Double.parseDouble(ReadingsManager.instance().reading(i).weight()) - mean;
+		}
+		return deviations;
+	}
+
+	private double[] deviationSquared(double[] deviation) {
+		double[] deviationSquared = new double[deviation.length];
+		for (int i = 0; i < deviation.length; i++) {
+			deviationSquared[i] = deviation[i] * deviation[i];
+		}
+		return deviationSquared;
+	}
+
+	private double sumOfDeviationSquared(double[] deviationSquared) {
+		double result = 0.0;
+		for (int i = 0; i < deviationSquared.length; i++) {
+			result += deviationSquared[i];
+		}
+		return result;
+	}
+
+	private double variance(double sumOfDeviationSquared) {
+		return sumOfDeviationSquared / (ReadingsManager.instance().numberOfReadings() - 1);
 	}
 
 	private double columnToX(int column) {

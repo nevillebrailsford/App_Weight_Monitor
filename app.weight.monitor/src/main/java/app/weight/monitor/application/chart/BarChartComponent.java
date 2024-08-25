@@ -47,8 +47,9 @@ public class BarChartComponent extends ChartComponent {
 	 * Create and store the tool tips.
 	 */
 	protected void createLabelsAndTips() {
-		for (int i = ((BarChartModel) model).numberOfColumns() - 1; i >= 0; i--) {
-			tips[i] = (((BarChartModel) model).numberForValue(i)) + " @ " + ((BarChartModel) model).valueAtColumn(i);
+		BarChartModel m = (BarChartModel) model;
+		for (int i = m.numberOfColumns() - 1; i >= 0; i--) {
+			tips[i] = m.numberForValue(m.valueAtColumn(i)) + " @ " + m.valueAtColumn(i);
 		}
 	}
 
