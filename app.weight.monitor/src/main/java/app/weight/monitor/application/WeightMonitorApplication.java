@@ -87,7 +87,7 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 		LineChartComponent chartComponent = new LineChartComponent(ReadingsManager.instance(), chartPainter);
 		lineChartPanel = new ChartPanel(chartComponent);
 		weightTabbedPane.addTab("Weight Plot", lineChartPanel);
-		BarChartPainter barChartPainter = new BarChartPainter();
+		BarChartPainter barChartPainter = new BarChartPainter(ReadingsManager.instance());
 		BarChartComponent barChartComponent = new BarChartComponent(ReadingsManager.instance(), barChartPainter);
 		barChartPanel = new ChartPanel(barChartComponent);
 		weightTabbedPane.addTab("Weight Distribution", barChartPanel);

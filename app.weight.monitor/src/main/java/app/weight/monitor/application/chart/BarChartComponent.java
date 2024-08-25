@@ -12,7 +12,6 @@ import application.charting.ChartPainter;
 public class BarChartComponent extends ChartComponent {
 	private static final long serialVersionUID = 1L;
 
-	protected int[] counts;
 	protected double[] values;
 
 	/**
@@ -33,7 +32,6 @@ public class BarChartComponent extends ChartComponent {
 			if (tips == null || count != tips.length) {
 				values = new double[count];
 				labels = new String[count];
-				counts = new int[count];
 				tips = new String[count];
 			}
 		}
@@ -42,7 +40,6 @@ public class BarChartComponent extends ChartComponent {
 		createLabelsAndTips();
 
 		cp.setValues(values);
-		((BarChartPainter) cp).setCounts(counts);
 		cp.setLabels(labels);
 	}
 
@@ -63,7 +60,6 @@ public class BarChartComponent extends ChartComponent {
 		for (int i = 0; i < lSize; i++) {
 			double value = ((BarChartModel) model).valueAtColumn(i);
 			values[i] = value;
-			counts[i] = ((BarChartModel) model).numberForValue(value);
 			labels[i] = Integer.toString(((BarChartModel) model).numberForValue(value));
 		}
 	}
