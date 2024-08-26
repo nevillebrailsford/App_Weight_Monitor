@@ -321,6 +321,8 @@ public class EditorPanel extends ColoredPanel implements ListDataListener {
 		String weight = weightTextField.getText();
 		Calendar cal = weightCalendar.getCalendar();
 		selectedDate = LocalDate.ofInstant(cal.toInstant(), ZoneId.systemDefault());
+		double dweight = Double.parseDouble(weight);
+		weight = String.format("%.1f", dweight);
 		Reading newReading = new Reading(selectedDate, weight);
 		AddReadingChange addReadingChange = new AddReadingChange(newReading);
 		submitChange(addReadingChange);

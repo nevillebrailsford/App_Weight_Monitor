@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
+import java.util.logging.Logger;
 
 import javax.swing.JComponent;
 
@@ -16,8 +17,12 @@ import app.weight.monitor.application.WeightMonitorApplication;
 import app.weight.monitor.storage.ReadingsManager;
 import application.base.app.gui.ColorProvider;
 import application.charting.ChartPainter;
+import application.definition.ApplicationConfiguration;
 
 public class BarChartPainter extends ChartPainter {
+
+	private static final String CLASS_NAME = BarChartPainter.class.getName();
+	private static final Logger LOGGER = ApplicationConfiguration.logger();
 
 	private Rectangle2D.Double plotFrame;
 	private int lSize;
@@ -37,16 +42,22 @@ public class BarChartPainter extends ChartPainter {
 
 	public BarChartPainter(BarChartModel model) {
 		super();
+		LOGGER.entering(CLASS_NAME, "cinit");
 		this.model = model;
+		LOGGER.exiting(CLASS_NAME, "cinit");
 	}
 
 	@Override
 	public int indexOfEntryAt(MouseEvent me) {
-		return (int) Math.floor((me.getX() - plotFrame.getX()) / columnWidth);
+		LOGGER.entering(CLASS_NAME, "indexOfEntryAt");
+		int result = (int) Math.floor((me.getX() - plotFrame.getX()) / columnWidth);
+		LOGGER.exiting(CLASS_NAME, "indexOfEntryAt", result);
+		return result;
 	}
 
 	@Override
 	public void paint(Graphics g, JComponent c) {
+		LOGGER.entering(CLASS_NAME, "paint");
 		lSize = values.length;
 		if (lSize < 2) {
 			return;
@@ -55,6 +66,7 @@ public class BarChartPainter extends ChartPainter {
 		Graphics2D g2D = (Graphics2D) g;
 		drawGraph(g2D);
 		g2D.dispose();
+		LOGGER.exiting(CLASS_NAME, "paint");
 	}
 
 	private void drawGraph(Graphics2D g2D) {
@@ -87,9 +99,9 @@ public class BarChartPainter extends ChartPainter {
 		columnWidth = 420 / lSize;
 		if (count == null || count.length != lSize) {
 			count = new int[lSize];
-			for (int i = 0; i < lSize; i++) {
-				count[i] = model.numberForValue(model.valueAtColumn(i));
-			}
+		}
+		for (int i = 0; i < lSize; i++) {
+			count[i] = model.numberForValue(model.valueAtColumn(i));
 		}
 		if (color == null || color.length != lSize) {
 			color = new Color[lSize];

@@ -271,7 +271,7 @@ public class ReadingsManager extends AbstractTableModel implements ListModel<Str
 		for (ListDataListener ldl : listDataListeners) {
 			ldl.contentsChanged(e);
 		}
-		LOGGER.exiting(CLASS_NAME, "fireTreeStructureChanged");
+		LOGGER.exiting(CLASS_NAME, "fireListChanged");
 	}
 
 	// TableModel implementation
@@ -382,22 +382,31 @@ public class ReadingsManager extends AbstractTableModel implements ListModel<Str
 
 	@Override
 	public int numberOfColumns() {
+		LOGGER.entering(CLASS_NAME, "numberOfColumns");
 		double lWeight = Double.parseDouble(lightestWeight());
 		double hWeight = Double.parseDouble(heaviestWeight());
 		double diffWeight = Math.ceil(hWeight) - Math.floor(lWeight);
 		int numberOfColumns = (int) diffWeight * 2;
+		LOGGER.exiting(CLASS_NAME, "numberOfColumns", numberOfColumns);
 		return numberOfColumns;
 	}
 
 	@Override
 	public double valueAtColumn(int columnNumber) {
-		double value = Double.parseDouble(lightestWeight()) + (columnNumber * 0.5);
+		LOGGER.entering(CLASS_NAME, "valueAtColumn", columnNumber);
+		double value = Double.parseDouble(lightestWeight());
+		for (int i = 0; i < columnNumber; i++) {
+			value += 0.5;
+		}
+		LOGGER.exiting(CLASS_NAME, "valueAtColumn", value);
 		return value;
 	}
 
 	@Override
 	public int numberForValue(double value) {
+		LOGGER.entering(CLASS_NAME, "numberForValue", value);
 		int count = (int) readings.stream().filter((r) -> r.weight().equals(Double.toString(value))).count();
+		LOGGER.exiting(CLASS_NAME, "numberForValue", count);
 		return count;
 	}
 
