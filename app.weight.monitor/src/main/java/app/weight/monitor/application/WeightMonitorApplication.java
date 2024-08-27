@@ -227,7 +227,9 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 
 	@Override
 	public void changeStateChange() {
+		LOGGER.entering(CLASS_NAME, "changeStateChange");
 		setDoableActions();
+		LOGGER.exiting(CLASS_NAME, "changeStateChange");
 	}
 
 	@Override

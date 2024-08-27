@@ -246,23 +246,33 @@ public class ReadingsManager extends AbstractTableModel implements ListModel<Str
 
 	@Override
 	public int getSize() {
-		return readings.size();
+		LOGGER.entering(CLASS_NAME, "getSize");
+		int result = readings.size();
+		LOGGER.exiting(CLASS_NAME, "getSize", result);
+		return result;
 	}
 
 	@Override
 	public String getElementAt(int index) {
+		LOGGER.entering(CLASS_NAME, "getElementAt");
 		Reading reading = readings.get(index);
-		return reading.date().format(infoDateFormatter) + "       " + reading.weight();
+		String result = reading.date().format(infoDateFormatter) + "       " + reading.weight();
+		LOGGER.exiting(CLASS_NAME, "getElementAt", result);
+		return result;
 	}
 
 	@Override
 	public void addListDataListener(ListDataListener l) {
+		LOGGER.entering(CLASS_NAME, "addListDataListener", l);
 		listDataListeners.addElement(l);
+		LOGGER.exiting(CLASS_NAME, "addListDataListener");
 	}
 
 	@Override
 	public void removeListDataListener(ListDataListener l) {
+		LOGGER.entering(CLASS_NAME, "removeListDataListener", l);
 		listDataListeners.removeElement(l);
+		LOGGER.exiting(CLASS_NAME, "removeListDataListener");
 	}
 
 	private void fireListChanged() {
@@ -278,12 +288,18 @@ public class ReadingsManager extends AbstractTableModel implements ListModel<Str
 
 	@Override
 	public int getRowCount() {
-		return readings.size();
+		LOGGER.entering(CLASS_NAME, "getRowCount");
+		int result = readings.size();
+		LOGGER.exiting(CLASS_NAME, "getRowCount", result);
+		return result;
 	}
 
 	@Override
 	public int getColumnCount() {
-		return COLUMNS.length;
+		LOGGER.entering(CLASS_NAME, "getColumnCount");
+		int result = COLUMNS.length;
+		LOGGER.exiting(CLASS_NAME, "getColumnCount", result);
+		return result;
 	}
 
 	@Override
@@ -307,75 +323,108 @@ public class ReadingsManager extends AbstractTableModel implements ListModel<Str
 
 	@Override
 	public int numberOfReadings() {
-		return readings.size();
+		LOGGER.entering(CLASS_NAME, "numberOfReadings");
+		int result = readings.size();
+		LOGGER.exiting(CLASS_NAME, "numberOfReadings", result);
+		return result;
 	}
 
 	@Override
 	public int numberOfWeeks() {
+		LOGGER.entering(CLASS_NAME, "numberOfWeeks");
 		long first = LocalDate.parse(earliestDate(), infoDateFormatter).toEpochDay();
 		long last = LocalDate.parse(latestDate(), infoDateFormatter).toEpochDay();
 		int days = (int) (last - first);
-		return days / 7;
+		int result = days / 7;
+		LOGGER.exiting(CLASS_NAME, "numberOfWeeks", result);
+		return result;
 	}
 
 	@Override
 	public String earliestDate() {
+		LOGGER.entering(CLASS_NAME, "earliestDate");
 		Reading reading = readings.get(0);
-		return reading.date().format(infoDateFormatter);
+		String result = reading.date().format(infoDateFormatter);
+		LOGGER.exiting(CLASS_NAME, "earliestDate", result);
+		return result;
 	}
 
 	@Override
 	public String latestDate() {
+		LOGGER.entering(CLASS_NAME, "latestDate");
 		Reading reading = readings.get(readings.size() - 1);
-		return reading.date().format(infoDateFormatter);
+		String result = reading.date().format(infoDateFormatter);
+		LOGGER.exiting(CLASS_NAME, "latestDate", result);
+		return result;
 	}
 
 	@Override
 	public String earliestWeight() {
+		LOGGER.entering(CLASS_NAME, "earliestWeight");
 		Reading reading = readings.get(0);
 		double weight = Double.parseDouble(reading.weight());
-		return String.format("%.2f", weight);
+		String result = String.format("%.2f", weight);
+		LOGGER.exiting(CLASS_NAME, "earliestWeight", result);
+		return result;
 	}
 
 	@Override
 	public String latestWeight() {
+		LOGGER.entering(CLASS_NAME, "latestWeight");
 		Reading reading = readings.get(readings.size() - 1);
 		double weight = Double.parseDouble(reading.weight());
-		return String.format("%.2f", weight);
+		String result = String.format("%.2f", weight);
+		LOGGER.exiting(CLASS_NAME, "latestWeight", result);
+		return result;
 	}
 
 	@Override
 	public String changeInWeight() {
+		LOGGER.entering(CLASS_NAME, "changeInWeight");
 		double firstWeight = Double.parseDouble(earliestWeight());
 		double lastWeight = Double.parseDouble(latestWeight());
-		return String.format("%.2f", firstWeight - lastWeight);
+		String result = String.format("%.2f", firstWeight - lastWeight);
+		LOGGER.exiting(CLASS_NAME, "changeInWeight", result);
+		return result;
 	}
 
 	@Override
 	public String lightestWeight() {
+		LOGGER.entering(CLASS_NAME, "lightestWeight");
 		double min = readings.stream().map((r) -> Double.parseDouble(r.weight())).min(Double::compare).get();
-		return String.format("%.2f", min);
+		String result = String.format("%.2f", min);
+		LOGGER.exiting(CLASS_NAME, "lightestWeight", result);
+		return result;
 	}
 
 	@Override
 	public String heaviestWeight() {
+		LOGGER.entering(CLASS_NAME, "heaviestWeight");
 		double max = readings.stream().map((r) -> Double.parseDouble(r.weight())).max(Double::compare).get();
-		return String.format("%.2f", max);
+		String result = String.format("%.2f", max);
+		LOGGER.exiting(CLASS_NAME, "heaviestWeight", result);
+		return result;
 	}
 
 	@Override
 	public String averageWeight() {
+		LOGGER.entering(CLASS_NAME, "averageWeight");
 		double sum = readings.stream().mapToDouble((r) -> Double.parseDouble(r.weight())).sum();
 		double avg = sum / numberOfReadings();
-		return String.format("%.2f", avg);
+		String result = String.format("%.2f", avg);
+		LOGGER.exiting(CLASS_NAME, "averageWeight", result);
+		return result;
 	}
 
 	@Override
 	public String averageChangePerWeek() {
+		LOGGER.entering(CLASS_NAME, "averageChangePerWeek");
 		double changeInWeight = Double.parseDouble(changeInWeight());
 		int numberOfWeeks = numberOfWeeks();
 		double avg = changeInWeight / numberOfWeeks;
-		return String.format("%.2f", avg);
+		String result = String.format("%.2f", avg);
+		LOGGER.exiting(CLASS_NAME, "averageChangePerWeek", result);
+		return result;
 	}
 
 	// BarChartModel implementation

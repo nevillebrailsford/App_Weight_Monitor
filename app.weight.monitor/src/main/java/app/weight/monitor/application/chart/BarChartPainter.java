@@ -51,6 +51,8 @@ public class BarChartPainter extends ChartPainter {
 	public int indexOfEntryAt(MouseEvent me) {
 		LOGGER.entering(CLASS_NAME, "indexOfEntryAt");
 		int result = (int) Math.floor((me.getX() - plotFrame.getX()) / columnWidth);
+		result = Math.max(0, result);
+		result = Math.min(result, values.length - 1);
 		LOGGER.exiting(CLASS_NAME, "indexOfEntryAt", result);
 		return result;
 	}
@@ -70,6 +72,7 @@ public class BarChartPainter extends ChartPainter {
 	}
 
 	private void drawGraph(Graphics2D g2D) {
+		LOGGER.entering(CLASS_NAME, "drawGraph");
 		initializeValues();
 		drawFrame(g2D);
 		calculateMinAndMaxPoints();
@@ -81,18 +84,11 @@ public class BarChartPainter extends ChartPainter {
 //		drawBottomInfo(g2D);
 //		drawTrendLine(g2D);
 		drawTitle(g2D);
-	}
-
-	private void drawFrame(Graphics2D g2D) {
-		plotFrame = new Rectangle2D.Double(50, 40, 420, 280);
-		g2D.setPaint(ColorProvider.get(WeightMonitorApplication.colorChoice.background()));
-		g2D.fill(plotFrame);
-		g2D.setStroke(new BasicStroke(2));
-		g2D.setPaint(Color.black);
-		g2D.draw(plotFrame);
+		LOGGER.exiting(CLASS_NAME, "drawGraph");
 	}
 
 	private void initializeValues() {
+		LOGGER.entering(CLASS_NAME, "initializeValues");
 		value = new double[lSize];
 		minValue = 1000000;
 		maxValue = 0;
@@ -110,23 +106,40 @@ public class BarChartPainter extends ChartPainter {
 			}
 		}
 		labelFont = new Font("Arial", Font.BOLD, 14);
+		plotFrame = new Rectangle2D.Double(50, 40, 420, 280);
+		LOGGER.exiting(CLASS_NAME, "initializeValues");
+	}
+
+	private void drawFrame(Graphics2D g2D) {
+		LOGGER.entering(CLASS_NAME, "drawFrame");
+		g2D.setPaint(ColorProvider.get(WeightMonitorApplication.colorChoice.background()));
+		g2D.fill(plotFrame);
+		g2D.setStroke(new BasicStroke(2));
+		g2D.setPaint(Color.black);
+		g2D.draw(plotFrame);
+		LOGGER.exiting(CLASS_NAME, "drawFrame");
 	}
 
 	private void calculateMinAndMaxPoints() {
+		LOGGER.entering(CLASS_NAME, "calculateMinAndMaxPoints");
 		for (int i = 0; i < lSize; i++) {
 			value[i] = values[i];
 			minValue = Math.min(count[i], minValue);
 			maxValue = Math.max(count[i], maxValue);
 		}
+		LOGGER.exiting(CLASS_NAME, "calculateMinAndMaxPoints");
 	}
 
 	private void adjustMinAndMax() {
+		LOGGER.entering(CLASS_NAME, "adjustMinAndMax");
 		if (minValue == maxValue) {
 			minValue = maxValue - 1;
 		}
+		LOGGER.exiting(CLASS_NAME, "adjustMinAndMax");
 	}
 
 	private void calculateSpacing() {
+		LOGGER.entering(CLASS_NAME, "calculateSpacing");
 		if (maxValue - minValue <= 5.0)
 			gridSpacing = 1.0;
 		else if (maxValue - minValue <= 10.0)
@@ -137,17 +150,21 @@ public class BarChartPainter extends ChartPainter {
 			gridSpacing = 10.0;
 		else
 			gridSpacing = 20.0;
+		LOGGER.exiting(CLASS_NAME, "calculateSpacing");
 	}
 
 	private void calculateIntervals() {
+		LOGGER.entering(CLASS_NAME, "calculateIntervals");
 		if (maxValue % (int) gridSpacing != 0)
 			maxValue = gridSpacing * (int) (maxValue / gridSpacing) + gridSpacing;
 		if (minValue % (int) gridSpacing != 0)
 			minValue = gridSpacing * (int) (minValue / gridSpacing);
 		intervals = (int) ((maxValue - minValue) / gridSpacing);
+		LOGGER.exiting(CLASS_NAME, "calculateIntervals");
 	}
 
 	private void drawBarChart(Graphics2D g2D) {
+		LOGGER.entering(CLASS_NAME, "drawBarChart");
 		// draw bar chart
 		g2D.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER));
 		for (int i = 0; i < lSize; i++) {
@@ -158,9 +175,11 @@ public class BarChartPainter extends ChartPainter {
 			g2D.setPaint(Color.black);
 			g2D.draw(bar);
 		}
+		LOGGER.exiting(CLASS_NAME, "drawBarChart");
 	}
 
 	private void drawYLabelsAndGridLines(Graphics2D g2D) {
+		LOGGER.entering(CLASS_NAME, "drawYLabelsAndGridLines");
 		// Draw y labels and grid lines
 		g2D.setFont(labelFont);
 		g2D.setStroke(new BasicStroke(1));
@@ -178,9 +197,11 @@ public class BarChartPainter extends ChartPainter {
 			}
 			wLegend += gridSpacing;
 		}
+		LOGGER.exiting(CLASS_NAME, "drawYLabelsAndGridLines");
 	}
 
 	private void drawTitle(Graphics2D g2D) {
+		LOGGER.entering(CLASS_NAME, "drawTitle");
 		double standardDeviation = standardDeviation();
 		String title = "Weight Distribution " + '\u03C3' + " " + String.format("%.5f", standardDeviation) + "kg";
 		Font titleFont = new Font("Arial", Font.BOLD, 16);
@@ -189,49 +210,64 @@ public class BarChartPainter extends ChartPainter {
 		g2D.setPaint(Color.black);
 		g2D.drawString(title, (int) (plotFrame.getX() + 0.5 * (plotFrame.getWidth() - titleRect.getWidth())),
 				(int) (plotFrame.getY() - 10));
+		LOGGER.exiting(CLASS_NAME, "drawTitle");
 	}
 
 	private double standardDeviation() {
+		LOGGER.entering(CLASS_NAME, "standardDeviation");
 		double mean = mean();
 		double[] deviation = deviation(mean);
 		double[] deviationSquared = deviationSquared(deviation);
 		double sumOfDeviationSquared = sumOfDeviationSquared(deviationSquared);
 		double variance = variance(sumOfDeviationSquared);
 		double standardDeviation = Math.sqrt(variance);
+		LOGGER.exiting(CLASS_NAME, "standardDeviation", standardDeviation);
 		return standardDeviation;
 	}
 
 	private double mean() {
-		return Double.parseDouble(ReadingsManager.instance().averageWeight());
+		LOGGER.entering(CLASS_NAME, "mean");
+		double mean = Double.parseDouble(ReadingsManager.instance().averageWeight());
+		LOGGER.exiting(CLASS_NAME, "mean", mean);
+		return mean;
 	}
 
 	private double[] deviation(double mean) {
+		LOGGER.entering(CLASS_NAME, "deviation", mean);
 		int numberOfReadings = ReadingsManager.instance().numberOfReadings();
 		double[] deviations = new double[numberOfReadings];
 		for (int i = 0; i < numberOfReadings; i++) {
 			deviations[i] = Double.parseDouble(ReadingsManager.instance().reading(i).weight()) - mean;
 		}
+		LOGGER.exiting(CLASS_NAME, "deviation");
 		return deviations;
 	}
 
 	private double[] deviationSquared(double[] deviation) {
+		LOGGER.entering(CLASS_NAME, "deviationSquared");
 		double[] deviationSquared = new double[deviation.length];
 		for (int i = 0; i < deviation.length; i++) {
 			deviationSquared[i] = deviation[i] * deviation[i];
 		}
+		LOGGER.exiting(CLASS_NAME, "deviationSquared");
 		return deviationSquared;
 	}
 
 	private double sumOfDeviationSquared(double[] deviationSquared) {
+		LOGGER.entering(CLASS_NAME, "sumOfDeviationSquared");
 		double result = 0.0;
 		for (int i = 0; i < deviationSquared.length; i++) {
 			result += deviationSquared[i];
 		}
+		LOGGER.exiting(CLASS_NAME, "sumOfDeviationSquared", result);
 		return result;
 	}
 
 	private double variance(double sumOfDeviationSquared) {
-		return sumOfDeviationSquared / (ReadingsManager.instance().numberOfReadings() - 1);
+		LOGGER.entering(CLASS_NAME, "variance", sumOfDeviationSquared);
+		double variance = sumOfDeviationSquared / (ReadingsManager.instance().numberOfReadings() - 1);
+		LOGGER.exiting(CLASS_NAME, "variance", variance);
+		return variance;
 	}
 
 	private double columnToX(int column) {
@@ -244,20 +280,6 @@ public class BarChartPainter extends ChartPainter {
 
 	private double countToH(int count, double minCount, double maxCount) {
 		return plotFrame.getY() + plotFrame.getHeight() - countToY(count, minCount, maxCount);
-	}
-
-	private void printArray(int[] array) {
-		for (int i = 0; i < array.length; i++) {
-			System.out.print(array[i] + " ");
-		}
-		System.out.println();
-	}
-
-	private void printArray(double[] array) {
-		for (int i = 0; i < array.length; i++) {
-			System.out.print(array[i] + " ");
-		}
-		System.out.println();
 	}
 
 }
