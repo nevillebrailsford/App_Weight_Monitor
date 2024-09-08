@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import app.weight.monitor.application.IApplication;
+import app.weight.monitor.application.IWeightApplication;
 
 /**
  * Create a copy action.
@@ -15,14 +15,14 @@ public class CopyAction extends AbstractAction {
 	/**
 	 * The application.
 	 */
-	private IApplication application;
+	private IWeightApplication application;
 
 	/**
 	 * Create the copy action for this application.
 	 * 
 	 * @param application - the application.
 	 */
-	public CopyAction(IApplication application) {
+	public CopyAction(IWeightApplication application) {
 		super("Copy");
 		this.application = application;
 	}

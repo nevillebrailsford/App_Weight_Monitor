@@ -13,14 +13,14 @@ public class WeightMonitorStateListener implements ChangeStateListener {
 	private static final String CLASS_NAME = WeightMonitorStateListener.class.getName();
 	private static final Logger LOGGER = ApplicationConfiguration.logger();
 
-	private IApplication application = null;
+	private IWeightApplication application = null;
 
 	/**
 	 * Create the listener using the application.
 	 * 
 	 * @param application - the current application.
 	 */
-	public WeightMonitorStateListener(IApplication application) {
+	public WeightMonitorStateListener(IWeightApplication application) {
 		LOGGER.entering(CLASS_NAME, "cinit");
 		this.application = application;
 		ChangeManager.instance().addListener(this);

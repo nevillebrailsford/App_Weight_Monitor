@@ -1,9 +1,11 @@
 package app.weight.monitor.application;
 
+import application.base.app.IApplication;
+
 /**
  * A number of actions that the application will perform.
  */
-public interface IApplication {
+public interface IWeightApplication extends IApplication {
 
 	/**
 	 * Perform a copy action.
@@ -21,16 +23,6 @@ public interface IApplication {
 	void pasteAction();
 
 	/**
-	 * Perform a redo action.
-	 */
-	void redoAction();
-
-	/**
-	 * Perform an undo action.
-	 */
-	void undoAction();
-
-	/**
 	 * Change manager state has been updated.
 	 */
 	void changeStateChange();
@@ -39,20 +31,5 @@ public interface IApplication {
 	 * Copy manager state has changed.
 	 */
 	void copyStateChange();
-
-	/**
-	 * Leave the application.
-	 */
-	void exitAction();
-
-	/**
-	 * Show the preferences dialog.
-	 */
-	void preferencesAction();
-
-	/**
-	 * Display information about this application.
-	 */
-	void helpAboutAction();
 
 }

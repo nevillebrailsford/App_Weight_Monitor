@@ -13,14 +13,14 @@ public class WeightMonitorCopyListener implements CopyAndPasteListener {
 	private static final String CLASS_NAME = WeightMonitorCopyListener.class.getName();
 	private static final Logger LOGGER = ApplicationConfiguration.logger();
 
-	private IApplication application = null;
+	private IWeightApplication application = null;
 
 	/**
 	 * Create the listener, using the current application.
 	 * 
 	 * @param application - the current application.
 	 */
-	public WeightMonitorCopyListener(IApplication application) {
+	public WeightMonitorCopyListener(IWeightApplication application) {
 		LOGGER.entering(CLASS_NAME, "cinit");
 		this.application = application;
 		CopyAndPaste.instance().addListener(this);

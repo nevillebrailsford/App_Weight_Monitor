@@ -15,7 +15,7 @@
         <junit.jupiter.version>5.9.1</junit.jupiter.version>
         <junit.platform.version>1.9.1</junit.platform.version>
         <itext.version>7.2.1</itext.version>
-        <app.base.version>2.1.7</app.base.version>
+        <app.base.version>3.0.0</app.base.version>
     </properties>
 
     <dependencies>
@@ -43,6 +43,14 @@
             <version>${junit.platform.version}</version>
             <scope>test</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.assertj/assertj-swing-junit -->
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-swing-junit</artifactId>
+            <version>3.17.1</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>com.toedter</groupId>
             <artifactId>jcalendar</artifactId>

@@ -32,8 +32,8 @@ import javax.swing.event.ListSelectionEvent;
 
 import com.toedter.calendar.JCalendar;
 
-import app.weight.monitor.actions.ActionFactory;
-import app.weight.monitor.application.IApplication;
+import app.weight.monitor.actions.WeightActionFactory;
+import app.weight.monitor.application.IWeightApplication;
 import app.weight.monitor.change.AddReadingChange;
 import app.weight.monitor.change.RemoveReadingChange;
 import app.weight.monitor.model.Reading;
@@ -70,17 +70,17 @@ public class EditorPanel extends ColoredPanel implements ListDataListener {
 	private ListModel<String> weightsListModel = null;
 	private JButton deleteButton = new JButton();
 
-	private ActionFactory actionFactory = null;
+	private WeightActionFactory actionFactory = null;
 
 	/**
 	 * Create the editor panel for this application.
 	 * 
 	 * @param application - the application that this panel is used by.
 	 */
-	public EditorPanel(IApplication application) {
+	public EditorPanel(IWeightApplication application) {
 		super();
 		LOGGER.entering(CLASS_NAME, "init");
-		actionFactory = ActionFactory.instance(application);
+		actionFactory = WeightActionFactory.instance();
 		weightsListModel = ReadingsManager.instance();
 		ReadingsManager.instance().addListDataListener(this);
 		setLayout(new GridBagLayout());
@@ -96,20 +96,6 @@ public class EditorPanel extends ColoredPanel implements ListDataListener {
 	@Override
 	public void requestFocus() {
 		weightTextField.requestFocus();
-	}
-
-	/**
-	 * Undo the last add or delete action.
-	 */
-	public void undoAction() {
-		ChangeManager.instance().undo();
-	}
-
-	/**
-	 * Redo the action last undone.
-	 */
-	public void redoAction() {
-		ChangeManager.instance().redo();
 	}
 
 	/**

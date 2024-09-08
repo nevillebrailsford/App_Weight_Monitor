@@ -10,7 +10,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 
 import app.weight.monitor.Constants;
-import app.weight.monitor.actions.ActionFactory;
+import app.weight.monitor.actions.WeightActionFactory;
 import app.weight.monitor.application.chart.BarChartComponent;
 import app.weight.monitor.application.chart.BarChartPainter;
 import app.weight.monitor.application.chart.LineChartComponent;
@@ -36,7 +36,7 @@ import application.storage.StoreDetails;
 /**
  * The application to record and monitor my weight readings.
  */
-public class WeightMonitorApplication extends ApplicationBaseForGUI implements IApplication {
+public class WeightMonitorApplication extends ApplicationBaseForGUI implements IWeightApplication {
 
 	private static final long serialVersionUID = 1L;
 	private static final String CLASS_NAME = WeightMonitorApplication.class.getName();
@@ -55,9 +55,10 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 	ChartPanel barChartPanel = null;
 
 	@Override
-	public void configureStoreDetails() {
+	public StoreDetails configureStoreDetails() {
 		dataLoader = new ReadingsLoad();
-		storeDetails = new StoreDetails(dataLoader, Constants.MODEL, Constants.READINGS_FILE);
+		StoreDetails storeDetails = new StoreDetails(dataLoader, Constants.MODEL, Constants.READINGS_FILE);
+		return storeDetails;
 	}
 
 	@Override
@@ -153,14 +154,14 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 
 	private void setDoableActions() {
 		LOGGER.entering(CLASS_NAME, "setDoableActions");
-		ActionFactory.instance(this).undoAction().setEnabled(ChangeManager.instance().undoable());
-		ActionFactory.instance(this).redoAction().setEnabled(ChangeManager.instance().redoable());
+		WeightActionFactory.instance(this).undoAction().setEnabled(ChangeManager.instance().undoable());
+		WeightActionFactory.instance(this).redoAction().setEnabled(ChangeManager.instance().redoable());
 		LOGGER.exiting(CLASS_NAME, "setDoableActions");
 	}
 
 	private void setCopyableActions() {
 		LOGGER.entering(CLASS_NAME, "setCopyableActions");
-		ActionFactory.instance(this).pasteAction().setEnabled(CopyAndPaste.instance().paste() != null);
+		WeightActionFactory.instance(this).pasteAction().setEnabled(CopyAndPaste.instance().paste() != null);
 		LOGGER.exiting(CLASS_NAME, "setCopyableActions");
 	}
 
@@ -198,31 +199,36 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 		colorChoice = new ColorChoice(background, chartLine, trendLine);
 	}
 
-	// IApplication implementation
-
-	@Override
-	public void redoAction() {
-		editorPanel.redoAction();
-	}
-
-	@Override
-	public void undoAction() {
-		editorPanel.undoAction();
-	}
+	// IWeightApplication implementation
 
 	@Override
 	public void copyAction() {
+		LOGGER.entering(CLASS_NAME, "copyAction");
 		editorPanel.copyAction();
+		LOGGER.exiting(CLASS_NAME, "copyAction");
 	}
 
 	@Override
 	public void pasteAction() {
+		LOGGER.entering(CLASS_NAME, "pasteAction");
 		editorPanel.pasteAction();
+		LOGGER.exiting(CLASS_NAME, "pasteAction");
 	}
 
 	@Override
 	public void deleteAction() {
+		LOGGER.entering(CLASS_NAME, "deleteAction");
 		editorPanel.deleteAction();
+		LOGGER.exiting(CLASS_NAME, "deleteAction");
+	}
+
+	@Override
+	public void preferencesAction() {
+		LOGGER.entering(CLASS_NAME, "preferencesAction");
+		WeightMonitorPreferencesDialog dialog = new WeightMonitorPreferencesDialog(parent);
+		dialog.setVisible(true);
+		dialog.dispose();
+		LOGGER.exiting(CLASS_NAME, "preferencesAction");
 	}
 
 	@Override
@@ -235,19 +241,6 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 	@Override
 	public void copyStateChange() {
 		setCopyableActions();
-	}
-
-	@Override
-	public void exitAction() {
-		shutdown();
-	}
-
-	@Override
-	public void preferencesAction() {
-		WeightMonitorPreferencesDialog dialog = new WeightMonitorPreferencesDialog(parent);
-		dialog.setVisible(true);
-		dialog.dispose();
-
 	}
 
 	@Override

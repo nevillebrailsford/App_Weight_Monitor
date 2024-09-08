@@ -10,8 +10,8 @@ import javax.swing.JPanel;
 import app.weight.monitor.application.WeightMonitorApplication;
 import app.weight.monitor.application.gui.GUIConstants;
 import application.base.app.gui.ColorProvider;
-import application.base.app.gui.PreferencesDialog;
 import application.inifile.IniFile;
+import application.preferences.PreferencesDialog;
 
 /**
  * Add optional choices to the preferences dialog.

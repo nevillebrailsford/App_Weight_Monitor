@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import app.weight.monitor.application.IApplication;
+import app.weight.monitor.application.IWeightApplication;
 
 /**
  * Create a delete action.
@@ -15,14 +15,14 @@ public class DeleteAction extends AbstractAction {
 	/**
 	 * The application.
 	 */
-	private IApplication application;
+	private IWeightApplication application;
 
 	/**
 	 * Create the delete action for this application.
 	 * 
 	 * @param application - the application.
 	 */
-	public DeleteAction(IApplication application) {
+	public DeleteAction(IWeightApplication application) {
 		super("Delete");
 		this.application = application;
 	}
