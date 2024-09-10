@@ -82,7 +82,6 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 		configureComponents();
 		layoutComponents();
 		loadData();
-		new WeightMonitorStateListener(this);
 		new WeightMonitorCopyListener(this);
 		LineChartPainter chartPainter = new LineChartPainter();
 		LineChartComponent chartComponent = new LineChartComponent(ReadingsManager.instance(), chartPainter);
@@ -229,13 +228,6 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 		dialog.setVisible(true);
 		dialog.dispose();
 		LOGGER.exiting(CLASS_NAME, "preferencesAction");
-	}
-
-	@Override
-	public void changeStateChange() {
-		LOGGER.entering(CLASS_NAME, "changeStateChange");
-		setDoableActions();
-		LOGGER.exiting(CLASS_NAME, "changeStateChange");
 	}
 
 	@Override

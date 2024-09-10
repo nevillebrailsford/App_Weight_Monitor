@@ -23,11 +23,6 @@ public interface IWeightApplication extends IApplication {
 	void pasteAction();
 
 	/**
-	 * Change manager state has been updated.
-	 */
-	void changeStateChange();
-
-	/**
 	 * Copy manager state has changed.
 	 */
 	void copyStateChange();
