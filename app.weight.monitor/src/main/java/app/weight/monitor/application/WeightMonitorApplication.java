@@ -6,7 +6,6 @@ import java.awt.GridBagLayout;
 import java.util.logging.Logger;
 
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 
 import app.weight.monitor.Constants;
@@ -164,24 +163,6 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 		LOGGER.exiting(CLASS_NAME, "setCopyableActions");
 	}
 
-	private String getBuildInformation(String applicationName) {
-		LOGGER.entering(applicationName, "getBuildInformation");
-		String result = "";
-		StringBuilder builder = new StringBuilder(applicationName);
-		try {
-			builder.append("\nBuild: ").append(ApplicationDefinition.getFromManifest("Build-Number", getClass())
-					.orElse("Could not be determined"));
-			builder.append("\nBuild Date: ").append(
-					ApplicationDefinition.getFromManifest("Build-Date", getClass()).orElse("Could not be determined"));
-		} catch (Exception e) {
-			builder.append("\nUnable to gather build version and date information\ndue to exception " + e.getMessage());
-			LOGGER.fine("Caught exception: " + e.getMessage());
-		}
-		result = builder.toString();
-		LOGGER.exiting(applicationName, "getBuildInformation", result);
-		return result;
-	}
-
 	private static void processPreferences() {
 		String background = IniFile.value(GUIConstants.BACKGROUND_COLOR);
 		String chartLine = IniFile.value(GUIConstants.CHART_LINE_COLOR);
@@ -233,14 +214,6 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 	@Override
 	public void copyStateChange() {
 		setCopyableActions();
-	}
-
-	@Override
-	public void helpAboutAction() {
-		String applicationName = ApplicationConfiguration.applicationDefinition().applicationName();
-		String title = "About " + applicationName;
-		String message = getBuildInformation(applicationName);
-		JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
 	}
 
 }
