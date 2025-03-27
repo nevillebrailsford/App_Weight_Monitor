@@ -103,23 +103,6 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 		LOGGER.exiting(CLASS_NAME, "terminate");
 	}
 
-	/**
-	 * Main entry point for the application.
-	 * <p>
-	 * The parameters that the application will read are:
-	 * <p>
-	 * --name=x where x is the name to be used by the application.
-	 * <p>
-	 * --dir=x where x is the path to the working directory.
-	 * 
-	 * @param args - any number of arguments passed in from command line. The values
-	 *             must include the values for --name and --dir.
-	 */
-	public static void main(String[] args) {
-		System.setProperty("apple.eawt.quitStrategy", "CLOSE_ALL_WINDOWS");
-		launch(args);
-	}
-
 	private void configureComponents() {
 		LOGGER.entering(CLASS_NAME, "configureComponents");
 		weightTabbedPane.setPreferredSize(new Dimension(500, 400));
