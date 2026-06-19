@@ -20,6 +20,7 @@ import app.weight.monitor.InformationModel;
 import app.weight.monitor.model.Reading;
 import application.definition.ApplicationConfiguration;
 import application.storage.Storage;
+import application.utils.Util;
 
 /**
  * ReadingManager provides the interface to the backing storage for the weight
@@ -309,7 +310,9 @@ public class ReadingsManager extends AbstractTableModel implements ListModel<Str
 		String result = "Unknown";
 		switch (columnIndex) {
 			case DATE:
+				Util u = null;
 				result = reading.date().format(dateFormatter);
+				result = Util.displayDate(reading.date());
 				break;
 			case WEIGHT:
 				result = reading.weight();
