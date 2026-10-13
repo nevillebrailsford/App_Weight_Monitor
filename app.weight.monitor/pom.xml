@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>brailsoft</groupId>
     <artifactId>app.weight.monitor</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>App Weight Monitor</name>
     <description>Application to keep track of my weight</description>
 
@@ -49,7 +49,6 @@
             <version>3.17.1</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>com.toedter</groupId>
             <artifactId>jcalendar</artifactId>
@@ -64,16 +63,6 @@
             <groupId>brailsoft</groupId>
             <artifactId>app.base</artifactId>
             <version>${app.base.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.mysql</groupId>
-            <artifactId>mysql-connector-j</artifactId>
-            <version>8.2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>6.6.11.Final</version>
         </dependency>
     </dependencies>
 

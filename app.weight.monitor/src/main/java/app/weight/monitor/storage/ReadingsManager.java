@@ -310,7 +310,6 @@ public class ReadingsManager extends AbstractTableModel implements ListModel<Str
 		String result = "Unknown";
 		switch (columnIndex) {
 			case DATE:
-				Util u = null;
 				result = reading.date().format(dateFormatter);
 				result = Util.displayDate(reading.date());
 				break;

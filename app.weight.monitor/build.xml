@@ -6,7 +6,7 @@
 	<property name="dir.buildfile" value="." />
 	<property name="dir.workspace" value="${dir.buildfile}" />
 	<property name="app.base.version" value="4.1.2" />
-	<property name="app.version" value="1.0.0" />
+	<property name="app.version" value="1.0.1" />
 	<condition property="isWindows">
 		<os family="windows" />
 	</condition>
@@ -15,11 +15,11 @@
 	</condition>
 
 	<target name="setWindowsRoot" if="isWindows">
-		<property name="user.root" value="C:/Users/nevil" />
+		<property name="user.root" value="C:/Users/${user.name}" />
 	</target>
 
 	<target name="setMacRoot" if="isMac">
-		<property name="user.root" value="/Users/nevil" />
+		<property name="user.root" value="/Users/${user.name}" />
 	</target>
 
 	<target name="create_run_jar" depends="setWindowsRoot, setMacRoot">

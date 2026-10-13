@@ -76,20 +76,23 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 		this.parent.setJMenuBar(new WeightMonitorMenuBar(this));
 		this.parent.setLayout(new GridBagLayout());
 		editorPanel = new EditorPanel(this);
-		informationPanel = new InformationPanel();
 		processPreferences();
 		configureComponents();
 		layoutComponents();
 		loadData();
 		new WeightMonitorCopyListener(this);
-		LineChartPainter chartPainter = new LineChartPainter();
-		LineChartComponent chartComponent = new LineChartComponent(ReadingsManager.instance(), chartPainter);
-		lineChartPanel = new ChartPanel(chartComponent);
-		weightTabbedPane.addTab("Weight Plot", lineChartPanel);
-		BarChartPainter barChartPainter = new BarChartPainter(ReadingsManager.instance());
-		BarChartComponent barChartComponent = new BarChartComponent(ReadingsManager.instance(), barChartPainter);
-		barChartPanel = new ChartPanel(barChartComponent);
-		weightTabbedPane.addTab("Weight Distribution", barChartPanel);
+		if (ReadingsManager.instance().readings().size() > 0) {
+			informationPanel = new InformationPanel();
+			weightTabbedPane.addTab("Information", informationPanel);
+			LineChartPainter chartPainter = new LineChartPainter();
+			LineChartComponent chartComponent = new LineChartComponent(ReadingsManager.instance(), chartPainter);
+			lineChartPanel = new ChartPanel(chartComponent);
+			weightTabbedPane.addTab("Weight Plot", lineChartPanel);
+			BarChartPainter barChartPainter = new BarChartPainter(ReadingsManager.instance());
+			BarChartComponent barChartComponent = new BarChartComponent(ReadingsManager.instance(), barChartPainter);
+			barChartPanel = new ChartPanel(barChartComponent);
+			weightTabbedPane.addTab("Weight Distribution", barChartPanel);
+		}
 		pack();
 		editorPanel.requestFocus();
 		LOGGER.exiting(CLASS_NAME, "start");
@@ -107,7 +110,6 @@ public class WeightMonitorApplication extends ApplicationBaseForGUI implements I
 		LOGGER.entering(CLASS_NAME, "configureComponents");
 		weightTabbedPane.setPreferredSize(new Dimension(500, 400));
 		weightTabbedPane.addTab("Weight Editor", editorPanel);
-		weightTabbedPane.addTab("Information", informationPanel);
 		LOGGER.exiting(CLASS_NAME, "configureComponents");
 	}
 
